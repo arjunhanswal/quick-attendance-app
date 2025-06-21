@@ -12,7 +12,7 @@ class _AddUserPageState extends State<AddUserPage> {
   final _formKey = GlobalKey<FormState>();
   String _name = '';
   String _userId = '';
-  String _center = '';
+  String _center = 'Sukhliya'; // Default value
   String? _selectedDepartment;
 
   final TextEditingController _centerController =
@@ -75,10 +75,9 @@ class _AddUserPageState extends State<AddUserPage> {
                 ),
                 SizedBox(height: 12),
                 TextFormField(
-                  controller: _centerController,
+                  initialValue: _center,
                   decoration: InputDecoration(labelText: 'Center'),
-                  validator: (value) =>
-                      value!.isEmpty ? 'Enter center' : "null",
+                  validator: (value) => value!.isEmpty ? 'Enter center' : null,
                   onSaved: (value) => _center = value!,
                 ),
                 SizedBox(height: 12),

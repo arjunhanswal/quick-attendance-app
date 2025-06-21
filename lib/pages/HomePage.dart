@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> {
               }
             },
             itemBuilder: (BuildContext context) {
-              return {'Settings', 'Logout'}.map((String choice) {
+              return {'Settings', 'Info'}.map((String choice) {
                 return PopupMenuItem<String>(
                   value: choice,
                   child: Text(choice),
@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               leading: Icon(Icons.logout),
-              title: Text('Logout'),
+              title: Text('Info'),
               onTap: () {
                 Navigator.pop(context);
                 // Handle logout

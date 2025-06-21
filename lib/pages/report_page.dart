@@ -116,6 +116,7 @@ class _ReportPageState extends State<ReportPage> {
     return Scaffold(
       body: Column(
         children: [
+          SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [

@@ -73,6 +73,16 @@ class _AttendancePageState extends State<AttendancePage> {
             _selectedTime!.minute)
         : now;
 
+    final alreadyMarked = _getTodayAttendance()
+        .any((record) => record.userId == _selectedUser!.userId);
+
+    if (alreadyMarked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${_selectedUser!.name} is already marked.')),
+      );
+      return;
+    }
+
     final weekStart = now.subtract(Duration(days: now.weekday % 7));
 
     _attendanceBox.add(AttendanceModel(
@@ -85,7 +95,6 @@ class _AttendancePageState extends State<AttendancePage> {
       SnackBar(content: Text('Attendance recorded for ${_selectedUser!.name}')),
     );
 
-    // Clear selection
     setState(() {
       _selectedUser = null;
       _selectedTime = null;
@@ -93,14 +102,20 @@ class _AttendancePageState extends State<AttendancePage> {
     });
   }
 
+  void _deleteAttendance(AttendanceModel record) {
+    final key = record.key;
+    _attendanceBox.delete(key);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text('Attendance')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // 🔍 Search bar
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -109,17 +124,20 @@ class _AttendancePageState extends State<AttendancePage> {
               ),
             ),
             SizedBox(height: 10),
-            // 🧑‍🦱 User list
+
+            // User list
             Expanded(
               child: ListView.builder(
                 itemCount: _filteredUsers.length,
                 itemBuilder: (context, index) {
                   final user = _filteredUsers[index];
+                  final isSelected = _selectedUser?.userId == user.userId;
                   return ListTile(
                     title: Text(user.name),
                     subtitle:
                         Text('ID: ${user.userId}, Center: ${user.center}'),
-                    trailing: _selectedUser?.userId == user.userId
+                    tileColor: isSelected ? Colors.blue.withOpacity(0.1) : null,
+                    trailing: isSelected
                         ? Icon(Icons.check_circle, color: Colors.green)
                         : null,
                     onTap: () {
@@ -132,7 +150,7 @@ class _AttendancePageState extends State<AttendancePage> {
               ),
             ),
             SizedBox(height: 10),
-            // ⏰ Time Picker
+
             ElevatedButton(
               onPressed: () => _pickTime(context),
               child: Text(
@@ -142,17 +160,20 @@ class _AttendancePageState extends State<AttendancePage> {
               ),
             ),
             SizedBox(height: 10),
-            // ✅ Submit Button
+
             ElevatedButton(
               onPressed: _submitAttendance,
               child: Text('Submit Attendance'),
               style: ElevatedButton.styleFrom(minimumSize: Size.fromHeight(45)),
             ),
             SizedBox(height: 20),
-            Text('Today\'s Attendance',
+
+            Text("Today's Attendance",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             SizedBox(height: 10),
-            Expanded(
+
+            SizedBox(
+              height: 150,
               child: ListView(
                 children: _getTodayAttendance().map((record) {
                   final user = _userBox.values.firstWhere(
@@ -169,6 +190,10 @@ class _AttendancePageState extends State<AttendancePage> {
                     title: Text(user.name),
                     subtitle: Text('Marked at: $time'),
                     leading: Icon(Icons.check, color: Colors.green),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => _deleteAttendance(record),
+                    ),
                   );
                 }).toList(),
               ),

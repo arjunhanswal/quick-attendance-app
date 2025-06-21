@@ -9,6 +9,7 @@ import 'pages/report_page.dart';
 import 'pages/add_user_page.dart';
 import 'pages/user_list_page.dart';
 import 'utils/hive_boxes.dart';
+import 'pages/setting.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +30,7 @@ void main() async {
       '/report': (context) => ReportPage(),
       '/add-user': (context) => AddUserPage(),
       '/user-list': (context) => UserListPage(),
+      '/settings': (context) => const SettingsPage(),
     },
   ));
 }

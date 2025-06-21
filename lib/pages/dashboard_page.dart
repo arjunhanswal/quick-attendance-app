@@ -65,8 +65,6 @@ class _DashboardPageState extends State<DashboardPage> {
               spacing: 16,
               runSpacing: 16,
               children: [
-                _buildActionTile('Attendance', Icons.check, '/attendance'),
-                _buildActionTile('Report', Icons.bar_chart, '/report'),
                 _buildActionTile('Add Sewadar', Icons.person_add, '/add-user'),
                 _buildActionTile('Sewadar List', Icons.people, '/user-list'),
               ],

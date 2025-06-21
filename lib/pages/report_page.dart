@@ -34,18 +34,38 @@ class _ReportPageState extends State<ReportPage> {
     return records;
   }
 
-  Future<void> _pickDateRange(BuildContext context) async {
-    final picked = await showDateRangePicker(
+  Future<void> _pickDate(BuildContext context) async {
+    final picked = await showDatePicker(
       context: context,
+      initialDate: DateTime.now(),
       firstDate: DateTime(2023),
       lastDate: DateTime.now(),
     );
     if (picked != null) {
       setState(() {
-        _startDate = picked.start;
-        _endDate = picked.end;
+        _startDate = picked;
+        _endDate = picked;
       });
     }
+  }
+
+  Map<String, List<AttendanceModel>> groupByWeek(
+      List<AttendanceModel> records) {
+    Map<String, List<AttendanceModel>> grouped = {};
+
+    for (var record in records) {
+      // Week starts on Sunday
+      DateTime weekStart = record.timestamp
+          .subtract(Duration(days: record.timestamp.weekday % 7));
+      String weekLabel = DateFormat('yyyy-MM-dd').format(weekStart);
+
+      if (!grouped.containsKey(weekLabel)) {
+        grouped[weekLabel] = [];
+      }
+      grouped[weekLabel]!.add(record);
+    }
+
+    return grouped;
   }
 
   Future<void> _exportToCSV(List<AttendanceModel> records) async {
@@ -92,6 +112,7 @@ class _ReportPageState extends State<ReportPage> {
   Widget build(BuildContext context) {
     final records = getFilteredRecords();
     final userBox = Hive.box<UserModel>(Boxes.userBox);
+    final groupedRecords = groupByWeek(records);
 
     return Scaffold(
       appBar: AppBar(title: Text("Attendance Report")),
@@ -101,11 +122,11 @@ class _ReportPageState extends State<ReportPage> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               ElevatedButton.icon(
-                onPressed: () => _pickDateRange(context),
+                onPressed: () => _pickDate(context),
                 icon: Icon(Icons.date_range),
                 label: Text(_startDate == null
                     ? "Pick Date"
-                    : "Filter: ${DateFormat('dd MMM').format(_startDate!)} - ${DateFormat('dd MMM').format(_endDate!)}"),
+                    : "Filter: ${DateFormat('dd MMM yyyy').format(_startDate!)}"),
               ),
               ElevatedButton.icon(
                 onPressed: () => _exportToCSV(records),

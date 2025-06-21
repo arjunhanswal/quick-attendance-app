@@ -16,6 +16,7 @@ dependencies:
   csv: ^5.0.2
   #file_picker: ^5.2.6
   share_plus: ^7.2.1
+  fl_chart: ^0.64.0
 
 dev_dependencies:
   flutter_test:

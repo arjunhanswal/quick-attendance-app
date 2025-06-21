@@ -11,7 +11,7 @@ class UserListPage extends StatelessWidget {
     final userBox = Hive.box<UserModel>(Boxes.userBox);
 
     return Scaffold(
-      appBar: AppBar(title: Text('User List')),
+      appBar: AppBar(title: Text('Sewadar List')),
       body: ValueListenableBuilder(
         valueListenable: userBox.listenable(),
         builder: (context, Box<UserModel> box, _) {
@@ -29,7 +29,29 @@ class UserListPage extends StatelessWidget {
                     'ID: ${user?.userId}, Center: ${user?.center}, Dept: ${user?.department}'),
                 trailing: IconButton(
                   icon: Icon(Icons.delete),
-                  onPressed: () => box.deleteAt(index),
+                  onPressed: () {
+                    final deletedUser = box.getAt(index);
+                    if (deletedUser == null) return;
+
+                    // Delete related attendance
+                    final attendanceBox = Hive.box(Boxes.attendanceBox);
+                    final keysToDelete = attendanceBox.keys.where((key) {
+                      final record = attendanceBox.get(key);
+                      return record['userId'] == deletedUser.userId;
+                    }).toList();
+
+                    for (var key in keysToDelete) {
+                      attendanceBox.delete(key);
+                    }
+
+                    // Delete the user
+                    box.deleteAt(index);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text('User and related attendance deleted')),
+                    );
+                  },
                 ),
               );
             },

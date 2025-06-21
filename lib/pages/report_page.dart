@@ -112,10 +112,8 @@ class _ReportPageState extends State<ReportPage> {
   Widget build(BuildContext context) {
     final records = getFilteredRecords();
     final userBox = Hive.box<UserModel>(Boxes.userBox);
-    final groupedRecords = groupByWeek(records);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Attendance Report")),
       body: Column(
         children: [
           Row(

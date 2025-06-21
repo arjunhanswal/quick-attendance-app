@@ -96,7 +96,6 @@ class _AttendancePageState extends State<AttendancePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Take Attendance')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

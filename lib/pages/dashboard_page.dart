@@ -51,10 +51,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Quick Attendance Dashboard'),
-      ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -94,23 +91,17 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600)),
             SizedBox(height: 10),
-            Text(
-              count.toString(),
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
+            Text(count.toString(),
+                style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
           ],
         ),
       ),
@@ -121,7 +112,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return GestureDetector(
       onTap: () async {
         await Navigator.pushNamed(context, route);
-        calculateStats(); // Refresh the counts when user returns
+        calculateStats(); // Refresh stats when returning
       },
       child: Card(
         elevation: 3,

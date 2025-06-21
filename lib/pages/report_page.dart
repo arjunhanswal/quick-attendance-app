@@ -116,24 +116,44 @@ class _ReportPageState extends State<ReportPage> {
           ),
           SizedBox(height: 10),
           Expanded(
-            child: ListView.builder(
-              itemCount: records.length,
-              itemBuilder: (context, index) {
-                final record = records[index];
-                final user = userBox.values.firstWhere(
-                  (u) => u.userId == record.userId,
-                  orElse: () => UserModel(
-                      name: 'Unknown', userId: '', center: '', department: ''),
-                );
-                final timeStr = DateFormat('HH:mm').format(record.timestamp);
-                final dateStr =
-                    DateFormat('yyyy-MM-dd').format(record.timestamp);
-                return ListTile(
-                  title: Text('${user.name} • $timeStr'),
-                  subtitle: Text('ID: ${user.userId}, Date: $dateStr'),
-                  trailing: Text(user.center),
-                );
-              },
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SingleChildScrollView(
+                child: DataTable(
+                  columns: const [
+                    DataColumn(label: Text('Name')),
+                    DataColumn(label: Text('User ID')),
+                    DataColumn(label: Text('Center')),
+                    DataColumn(label: Text('Department')),
+                    DataColumn(label: Text('Date')),
+                    DataColumn(label: Text('Time')),
+                  ],
+                  rows: records.map((record) {
+                    final user = userBox.values.firstWhere(
+                      (u) => u.userId == record.userId,
+                      orElse: () => UserModel(
+                          name: 'Unknown',
+                          userId: '',
+                          center: '',
+                          department: ''),
+                    );
+
+                    final dateStr =
+                        DateFormat('yyyy-MM-dd').format(record.timestamp);
+                    final timeStr =
+                        DateFormat('HH:mm').format(record.timestamp);
+
+                    return DataRow(cells: [
+                      DataCell(Text(user.name)),
+                      DataCell(Text(user.userId)),
+                      DataCell(Text(user.center)),
+                      DataCell(Text(user.department)),
+                      DataCell(Text(dateStr)),
+                      DataCell(Text(timeStr)),
+                    ]);
+                  }).toList(),
+                ),
+              ),
             ),
           ),
         ],

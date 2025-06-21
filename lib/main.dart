@@ -39,7 +39,7 @@ void main() async {
   runApp(MaterialApp(
     title: 'QuickAttendance',
     debugShowCheckedModeBanner: false,
-    theme: ThemeData.light(),
+    theme: ThemeData(useMaterial3: true),
     home: DashboardPage(),
     routes: {
       '/attendance': (_) => AttendancePage(),

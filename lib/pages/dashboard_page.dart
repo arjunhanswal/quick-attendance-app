@@ -17,8 +17,10 @@ class _DashboardPageState extends State<DashboardPage> {
   late Box<AttendanceModel> attendanceBox;
 
   int totalUsers = 0;
-  int presentToday = 0;
-  int absentToday = 0;
+  int presentCount = 0;
+  int absentCount = 0;
+
+  DateTime selectedDate = DateTime.now();
 
   @override
   void initState() {
@@ -29,46 +31,110 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void calculateStats() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
+    final dateOnly =
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
 
-    final todayAttendances = attendanceBox.values.where((record) {
+    final dayAttendances = attendanceBox.values.where((record) {
       final recordDate = DateTime(
         record.timestamp.year,
         record.timestamp.month,
         record.timestamp.day,
       );
-      return recordDate == today;
+      return recordDate == dateOnly;
     }).toList();
 
     setState(() {
       totalUsers = userBox.length;
-      presentToday = todayAttendances.length;
-      absentToday = totalUsers - presentToday;
+      presentCount = dayAttendances.length;
+      absentCount = totalUsers - presentCount;
     });
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2024),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked;
+      });
+      calculateStats();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final formattedDate = DateFormat.yMMMMd().format(selectedDate);
+
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Dashboard"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: calculateStats,
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // 📅 Date Display & Picker
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Showing data for:",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                TextButton.icon(
+                  icon: Icon(Icons.calendar_today),
+                  label: Text(DateFormat('EEE, MMM d').format(selectedDate)),
+                  onPressed: _pickDate,
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+
+            // 📊 Cards
             _buildStatCard('Total Sewadars', totalUsers, Colors.deepPurple),
             SizedBox(height: 10),
-            _buildStatCard('Present Today', presentToday, Colors.green),
+            _buildStatCard('Present', presentCount, Colors.green),
             SizedBox(height: 10),
-            _buildStatCard('Absent Today', absentToday, Colors.red),
+            _buildStatCard('Absent', absentCount, Colors.red),
             SizedBox(height: 30),
-            Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: [
-                _buildActionTile('Add Sewadar', Icons.person_add, '/add-user'),
-                _buildActionTile('Sewadar List', Icons.people, '/user-list'),
-              ],
-            )
+
+            // 📋 Attendance Preview
+            Text(
+              'Present on ${formattedDate}',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            SizedBox(height: 10),
+            ...attendanceBox.values
+                .where((record) =>
+                    record.timestamp.year == selectedDate.year &&
+                    record.timestamp.month == selectedDate.month &&
+                    record.timestamp.day == selectedDate.day)
+                .map((record) {
+              final user = userBox.values.firstWhere(
+                (u) => u.userId == record.userId,
+                orElse: () => UserModel(
+                  name: 'Unknown',
+                  userId: '',
+                  center: '',
+                  department: '',
+                ),
+              );
+              final time =
+                  TimeOfDay.fromDateTime(record.timestamp).format(context);
+              return ListTile(
+                leading: Icon(Icons.person, color: Colors.green),
+                title: Text(user.name),
+                subtitle: Text("Marked at: $time"),
+              );
+            }).toList()
           ],
         ),
       ),
@@ -77,14 +143,14 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Widget _buildStatCard(String label, int count, Color color) {
     return Card(
-      elevation: 6,
+      elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
           color: color,
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,32 +167,6 @@ class _DashboardPageState extends State<DashboardPage> {
                     fontWeight: FontWeight.bold,
                     color: Colors.white)),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionTile(String label, IconData icon, String route) {
-    return GestureDetector(
-      onTap: () async {
-        await Navigator.pushNamed(context, route);
-        calculateStats(); // Refresh stats when returning
-      },
-      child: Card(
-        elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Container(
-          width: 150,
-          height: 100,
-          padding: EdgeInsets.all(12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 30),
-              SizedBox(height: 8),
-              Text(label, style: TextStyle(fontWeight: FontWeight.w600)),
-            ],
-          ),
         ),
       ),
     );

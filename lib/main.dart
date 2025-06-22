@@ -10,6 +10,7 @@ import 'pages/add_user_page.dart';
 import 'pages/user_list_page.dart';
 import 'utils/hive_boxes.dart';
 import 'pages/setting.dart';
+import 'pages/department_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,7 @@ void main() async {
 
   await Hive.openBox<UserModel>(Boxes.userBox);
   await Hive.openBox<AttendanceModel>(Boxes.attendanceBox);
+  await Hive.openBox<String>(Boxes.departmentBox);
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -31,6 +33,7 @@ void main() async {
       '/add-user': (context) => AddUserPage(),
       '/user-list': (context) => UserListPage(),
       '/settings': (context) => const SettingsPage(),
+      '/departments': (context) => DepartmentPage(),
     },
   ));
 }

@@ -15,20 +15,20 @@ class _AddUserPageState extends State<AddUserPage> {
   String _center = 'Sukhliya'; // Default value
   String? _selectedDepartment;
 
-  final TextEditingController _centerController =
-      TextEditingController(text: 'Sukhliya');
+  List<String> _departments = [];
 
-  final List<String> _departments = [
-    'Sound',
-    'Traffic',
-    'Security',
-    'Book Stall',
-    'Management',
-    'Pathi',
-    'Book Reader',
-    'Admin',
-    'Other',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadDepartments();
+  }
+
+  void _loadDepartments() {
+    final deptBox = Hive.box<String>('departments');
+    setState(() {
+      _departments = deptBox.values.toList();
+    });
+  }
 
   void _saveUser() {
     if (_formKey.currentState!.validate()) {
@@ -67,26 +67,20 @@ class _AddUserPageState extends State<AddUserPage> {
                   validator: (value) => value!.isEmpty ? 'Enter name' : null,
                   onSaved: (value) => _name = value!,
                 ),
-                SizedBox(height: 12),
                 TextFormField(
                   decoration: InputDecoration(labelText: 'User ID'),
                   validator: (value) => value!.isEmpty ? 'Enter user ID' : null,
                   onSaved: (value) => _userId = value!,
                 ),
-                SizedBox(height: 12),
                 TextFormField(
                   initialValue: _center,
                   decoration: InputDecoration(labelText: 'Center'),
                   validator: (value) => value!.isEmpty ? 'Enter center' : null,
                   onSaved: (value) => _center = value!,
                 ),
-                SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: 'Select Department',
-                    border: OutlineInputBorder(),
-                  ),
                   value: _selectedDepartment,
+                  decoration: InputDecoration(labelText: 'Department'),
                   items: _departments.map((dept) {
                     return DropdownMenuItem(
                       value: dept,
@@ -98,14 +92,15 @@ class _AddUserPageState extends State<AddUserPage> {
                       _selectedDepartment = value;
                     });
                   },
-                  validator: (value) =>
-                      value == null ? 'Please select a department' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Select department'
+                      : null,
                 ),
-                SizedBox(height: 24),
+                SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _saveUser,
                   child: Text('Save User'),
-                ),
+                )
               ],
             ),
           ),

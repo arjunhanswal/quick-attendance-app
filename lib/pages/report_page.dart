@@ -17,21 +17,18 @@ class ReportPage extends StatefulWidget {
 }
 
 class _ReportPageState extends State<ReportPage> {
-  DateTime? _startDate;
-  DateTime? _endDate;
+  Set<DateTime> _selectedDates = {};
 
   List<AttendanceModel> getFilteredRecords() {
     final box = Hive.box<AttendanceModel>(Boxes.attendanceBox);
-    final records = box.values.where((record) {
-      if (_startDate != null && _endDate != null) {
-        return record.timestamp
-                .isAfter(_startDate!.subtract(Duration(days: 1))) &&
-            record.timestamp.isBefore(_endDate!.add(Duration(days: 1)));
-      }
-      return true;
-    }).toList();
-    records.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    return records;
+    if (_selectedDates.isEmpty) return box.values.toList();
+
+    return box.values.where((record) {
+      final date = DateTime(
+          record.timestamp.year, record.timestamp.month, record.timestamp.day);
+      return _selectedDates.contains(date);
+    }).toList()
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
   }
 
   Future<void> _pickDate(BuildContext context) async {
@@ -42,30 +39,15 @@ class _ReportPageState extends State<ReportPage> {
       lastDate: DateTime.now(),
     );
     if (picked != null) {
+      final pickedDateOnly = DateTime(picked.year, picked.month, picked.day);
       setState(() {
-        _startDate = picked;
-        _endDate = picked;
+        if (_selectedDates.contains(pickedDateOnly)) {
+          _selectedDates.remove(pickedDateOnly);
+        } else {
+          _selectedDates.add(pickedDateOnly);
+        }
       });
     }
-  }
-
-  Map<String, List<AttendanceModel>> groupByWeek(
-      List<AttendanceModel> records) {
-    Map<String, List<AttendanceModel>> grouped = {};
-
-    for (var record in records) {
-      // Week starts on Sunday
-      DateTime weekStart = record.timestamp
-          .subtract(Duration(days: record.timestamp.weekday % 7));
-      String weekLabel = DateFormat('yyyy-MM-dd').format(weekStart);
-
-      if (!grouped.containsKey(weekLabel)) {
-        grouped[weekLabel] = [];
-      }
-      grouped[weekLabel]!.add(record);
-    }
-
-    return grouped;
   }
 
   Future<void> _exportToCSV(List<AttendanceModel> records) async {
@@ -90,18 +72,16 @@ class _ReportPageState extends State<ReportPage> {
       ]);
     }
 
-    final directory = await getTemporaryDirectory(); // temporary so share works
+    final directory = await getTemporaryDirectory();
     final path =
         '${directory.path}/attendance_report_${DateTime.now().millisecondsSinceEpoch}.csv';
     final file = File(path);
     String csv = const ListToCsvConverter().convert(csvData);
     await file.writeAsString(csv);
 
-    // 🔥 Share directly
     await Share.shareXFiles([XFile(file.path)],
         text: 'Here is the exported attendance report CSV');
 
-    // ✅ Also optional: show local path in SnackBar
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('Exported and ready to share!'),
       duration: Duration(seconds: 2),
@@ -114,27 +94,64 @@ class _ReportPageState extends State<ReportPage> {
     final userBox = Hive.box<UserModel>(Boxes.userBox);
 
     return Scaffold(
+      appBar: AppBar(title: Text("Attendance Report")),
       body: Column(
         children: [
           SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () => _pickDate(context),
-                icon: Icon(Icons.date_range),
-                label: Text(_startDate == null
-                    ? "Pick Date"
-                    : "Filter: ${DateFormat('dd MMM yyyy').format(_startDate!)}"),
-              ),
-              ElevatedButton.icon(
-                onPressed: () => _exportToCSV(records),
-                icon: Icon(Icons.download),
-                label: Text("Export CSV"),
-              ),
-            ],
+
+          // 🔘 Filter Buttons
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => _pickDate(context),
+                  icon: Icon(Icons.date_range),
+                  label: Text("Select Date"),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton.icon(
+                  onPressed: () => _exportToCSV(records),
+                  icon: Icon(Icons.download),
+                  label: Text("Export CSV"),
+                ),
+                Spacer(),
+                if (_selectedDates.isNotEmpty)
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _selectedDates.clear();
+                      });
+                    },
+                    child: Text("Clear"),
+                  ),
+              ],
+            ),
           ),
+
           SizedBox(height: 10),
+
+          // 📅 Selected Dates Chips
+          if (_selectedDates.isNotEmpty)
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: _selectedDates.map((date) {
+                return Chip(
+                  label: Text(DateFormat('dd MMM').format(date)),
+                  deleteIcon: Icon(Icons.close),
+                  onDeleted: () {
+                    setState(() {
+                      _selectedDates.remove(date);
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+
+          SizedBox(height: 10),
+
+          // 📊 Attendance Table
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,

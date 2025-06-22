@@ -12,6 +12,22 @@ class SettingsPage extends StatelessWidget {
       body: ListView(
         children: [
           ListTile(
+            leading: Icon(Icons.add),
+            title: Text('Add Department'),
+            subtitle: Text('Add New Department'),
+            onTap: () async {
+              Navigator.pushNamed(context, '/departments');
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.list),
+            title: Text('All Sewadar List'),
+            subtitle: Text('List of all sewadar'),
+            onTap: () async {
+              await Navigator.pushNamed(context, "/user-list");
+            },
+          ),
+          ListTile(
             leading: Icon(Icons.info),
             title: Text('App Info'),
             subtitle: Text('Version 1.0.0'),

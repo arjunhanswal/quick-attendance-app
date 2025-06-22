@@ -23,33 +23,41 @@ class UserListPage extends StatelessWidget {
             itemCount: box.length,
             itemBuilder: (context, index) {
               final user = box.getAt(index);
+              if (user == null) return SizedBox();
+
               return ListTile(
-                title: Text(user?.name ?? ''),
+                leading: CircleAvatar(
+                  backgroundColor: Colors.blueAccent,
+                  child: Text(
+                    user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                title: Text(user.name),
                 subtitle: Text(
-                    'ID: ${user?.userId}, Center: ${user?.center}, Dept: ${user?.department}'),
+                    'ID: ${user.userId}, Center: ${user.center}, Dept: ${user.department}'),
                 trailing: IconButton(
-                  icon: Icon(Icons.delete),
+                  icon: Icon(Icons.delete, color: Colors.red),
                   onPressed: () {
                     final deletedUser = box.getAt(index);
                     if (deletedUser == null) return;
 
-                    // Delete related attendance
                     final attendanceBox = Hive.box(Boxes.attendanceBox);
                     final keysToDelete = attendanceBox.keys.where((key) {
                       final record = attendanceBox.get(key);
-                      return record['userId'] == deletedUser.userId;
+                      return record?.userId == deletedUser.userId;
                     }).toList();
 
                     for (var key in keysToDelete) {
                       attendanceBox.delete(key);
                     }
 
-                    // Delete the user
                     box.deleteAt(index);
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          content: Text('User and related attendance deleted')),
+                          content: Text(
+                              'User "${deletedUser.name}" and attendance deleted')),
                     );
                   },
                 ),
@@ -57,6 +65,16 @@ class UserListPage extends StatelessWidget {
             },
           );
         },
+      ),
+
+      // ➕ Floating Button
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/add-user');
+        },
+        backgroundColor: Colors.deepPurple,
+        child: Icon(Icons.add),
+        tooltip: 'Add New User',
       ),
     );
   }

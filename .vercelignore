@@ -1,0 +1,33 @@
+# System files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Node / Flutter / build outputs
+node_modules
+dist
+build
+out
+.cache
+coverage
+
+# Logs
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+*.log
+
+# IDE / Editor settings
+.vscode
+.idea
+*.swp
+
+# Flutter specific (if your app has Flutter web build)
+.dart_tool
+.packages
+.pub-cache
+.flutter-plugins
+.flutter-plugins-dependencies

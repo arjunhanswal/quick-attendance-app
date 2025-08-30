@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dashboard_page.dart';
 import 'attendance_page.dart';
 import 'report_page.dart';
@@ -24,18 +25,31 @@ class _HomePageState extends State<HomePage> {
     'Attendance',
     'Report',
   ];
-  String _getTitle() {
-    return _titles[_currentIndex];
+
+  String _getTitle() => _titles[_currentIndex];
+
+  Future<void> _logout() async {
+    try {
+      await Supabase.instance.client.auth.signOut();
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/login'); // redirect to login
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Logout failed: $e")),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = Supabase.instance.client.auth.currentUser;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_getTitle()),
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications),
             onPressed: () {
               // Optional: open notification page
             },
@@ -45,11 +59,11 @@ class _HomePageState extends State<HomePage> {
               if (value == 'Settings') {
                 Navigator.pushNamed(context, '/settings');
               } else if (value == 'Logout') {
-                // logout logic
+                _logout();
               }
             },
             itemBuilder: (BuildContext context) {
-              return {'Settings', 'Info'}.map((String choice) {
+              return {'Settings', 'Logout'}.map((String choice) {
                 return PopupMenuItem<String>(
                   value: choice,
                   child: Text(choice),
@@ -64,58 +78,63 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
+              decoration: const BoxDecoration(color: Colors.blue),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.account_circle, size: 48, color: Colors.white),
-                  SizedBox(height: 10),
-                  Text("Welcome",
-                      style: TextStyle(color: Colors.white, fontSize: 18)),
-                  Text("Admin",
-                      style: TextStyle(color: Colors.white70, fontSize: 14)),
+                  const Icon(Icons.account_circle,
+                      size: 48, color: Colors.white),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Welcome",
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                  Text(
+                    user?.email ?? "Admin",
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
                 ],
               ),
             ),
             ListTile(
-              leading: Icon(Icons.dashboard),
-              title: Text('Dashboard'),
+              leading: const Icon(Icons.dashboard),
+              title: const Text('Dashboard'),
               onTap: () {
                 Navigator.pop(context);
                 setState(() => _currentIndex = 0);
               },
             ),
             ListTile(
-              leading: Icon(Icons.check),
-              title: Text('Attendance'),
+              leading: const Icon(Icons.check),
+              title: const Text('Attendance'),
               onTap: () {
                 Navigator.pop(context);
                 setState(() => _currentIndex = 1);
               },
             ),
             ListTile(
-              leading: Icon(Icons.bar_chart),
-              title: Text('Report'),
+              leading: const Icon(Icons.bar_chart),
+              title: const Text('Report'),
               onTap: () {
                 Navigator.pop(context);
                 setState(() => _currentIndex = 2);
               },
             ),
-            Divider(),
+            const Divider(),
             ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/settings');
               },
             ),
             ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Info'),
+              leading: const Icon(Icons.logout),
+              title: const Text('Logout'),
               onTap: () {
                 Navigator.pop(context);
-                // Handle logout
+                _logout();
               },
             ),
           ],

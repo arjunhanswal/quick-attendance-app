@@ -381,6 +381,7 @@ class _AttendancePageState extends State<AttendancePage>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Attendance'),
+        automaticallyImplyLeading: false,
         bottom: TabBar(
           controller: _tabController,
           tabs: const [

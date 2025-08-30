@@ -215,6 +215,7 @@ class ReportPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Coming Soon'),
+        automaticallyImplyLeading: false,
       ),
       body: Center(
         child: Column(

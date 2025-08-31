@@ -11,55 +11,6 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _loading = false;
 
-  // Future<void> _login() async {
-  //   setState(() => _loading = true);
-
-  //   try {
-  //     final supabase = Supabase.instance.client;
-  //     final response = await supabase.auth.signInWithPassword(
-  //       email: _emailController.text.trim(),
-  //       password: _passwordController.text.trim(),
-  //     );
-
-  //     if (response.session != null && response.user != null) {
-  //       // ✅ Login successful
-  //       Navigator.pushReplacementNamed(context, '/');
-  //     } else {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text("Invalid email or password")),
-  //       );
-  //     }
-  //   } on AuthException catch (e) {
-  //     // ✅ Handles Supabase specific auth errors
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Auth Error: ${e.message}")),
-  //     );
-  //   } catch (e) {
-  //     // ✅ Handles all other errors
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Unexpected Error: $e")),
-  //     );
-  //   } finally {
-  //     setState(() => _loading = false);
-  //   }
-  // }
-  // Future<void> _login() async {
-  //   setState(() => _loading = true);
-
-  //   const validEmail = "admin";
-  //   const validPassword = "123@admin";
-
-  //   if (_emailController.text.trim() == validEmail &&
-  //       _passwordController.text.trim() == validPassword) {
-  //     Navigator.pushReplacementNamed(context, '/');
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Invalid credentials")),
-  //     );
-  //   }
-
-  //   setState(() => _loading = false);
-  // }
   Future<void> _login() async {
     setState(() => _loading = true);
 

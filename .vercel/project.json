@@ -1,0 +1,16 @@
+{
+  "projectId": "prj_4gCoZOz3R8WuSySRr92FnoKCBJas",
+  "orgId": "team_Spcx6QBYuRBxrEwK7yKrSMcd",
+  "projectName": "quick-attendance-app",
+  "settings": {
+    "createdAt": 1756547044309,
+    "framework": null,
+    "devCommand": null,
+    "installCommand": null,
+    "buildCommand": null,
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "22.x"
+  }
+}

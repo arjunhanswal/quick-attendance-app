@@ -3,34 +3,47 @@ name: Deploy Flutter Web to GitHub Pages
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v*.*.*" # Triggers only on new tags like v1.0.0
+
 permissions:
-  contents: write
+  contents: write # Needed for gh-pages push
+
 jobs:
-  build:
+  build-and-deploy:
+    name: Build & Deploy Flutter Web
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      # 1️⃣ Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2️⃣ Set up Flutter
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.35.2" # 👈 matches your local version
+          flutter-version: "3.35.2"
           channel: stable
 
-      - name: Enable web support
+      # 3️⃣ Enable web support
+      - name: Enable web
         run: flutter config --enable-web
 
+      # 4️⃣ Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Flutter web
+      # 5️⃣ Build web app
+      - name: Build Flutter Web
         run: flutter build web --release --base-href /quick-attendance-app/
 
+      # 6️⃣ Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
+          publish_branch: gh-pages
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          allow_empty_commit: false

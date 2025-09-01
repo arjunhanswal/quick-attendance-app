@@ -46,31 +46,71 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Login",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-              SizedBox(height: 20),
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(labelText: "username"),
-              ),
-              TextField(
-                controller: _passwordController,
-                decoration: InputDecoration(labelText: "Password"),
-                obscureText: true,
-              ),
-              SizedBox(height: 20),
-              _loading
-                  ? CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _login,
-                      child: Text("Login"),
-                    ),
-            ],
+        child: SingleChildScrollView(
+          // ✅ Scrollable for small screens
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // 🔹 App Logo
+                Image.asset(
+                  "assets/images/logo.png", // ✅ Add your logo here
+                  height: 100,
+                ),
+                const SizedBox(height: 16),
+
+                // 🔹 App Name
+                const Text(
+                  "Attendance App",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 40),
+
+                // 🔹 Login Title
+                const Text(
+                  "Login",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 20),
+
+                // 🔹 Username Input
+                TextField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: "Username",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // 🔹 Password Input
+                TextField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(
+                    labelText: "Password",
+                    border: OutlineInputBorder(),
+                  ),
+                  obscureText: true,
+                ),
+                const SizedBox(height: 20),
+
+                // 🔹 Login Button
+                _loading
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: _login,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize:
+                              const Size(double.infinity, 48), // Full width
+                        ),
+                        child: const Text("Login"),
+                      ),
+              ],
+            ),
           ),
         ),
       ),

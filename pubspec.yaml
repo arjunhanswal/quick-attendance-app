@@ -24,6 +24,34 @@ dev_dependencies:
     sdk: flutter
   build_runner: ^2.4.6
   hive_generator: ^2.0.1
+  flutter_launcher_icons: ^0.14.1
+  flutter_native_splash: ^2.4.0
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/logo.png
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: web/icons/logo.png
+  android: true # ✅ only once
+  ios: true
+  web: true
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  web:
+    generate: true
+    image_path: "web/icons/logo.png"
+    background_color: "#ffffff"
+    theme_color: "#1976d2"
+  windows:
+    generate: true
+    image_path: "web/icons/logo.png"
+    icon_size: 48
+  macos:
+    generate: true
+    image_path: "web/icons/logo.png"
+  image_path: "web/icons/logo.png"

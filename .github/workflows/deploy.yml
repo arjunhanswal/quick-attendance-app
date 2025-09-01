@@ -2,8 +2,10 @@ name: Deploy Flutter Web to GitHub Pages
 
 on:
   push:
+   tags:
+      - 'v*.*.*'
     branches:
-      - master # change if needed
+      - version-update
 permissions:
   contents: write
 jobs:

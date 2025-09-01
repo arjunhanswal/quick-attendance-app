@@ -1,245 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:supabase_flutter/supabase_flutter.dart';
-
-// class AttendancePage extends StatefulWidget {
-//   const AttendancePage({super.key});
-
-//   @override
-//   State<AttendancePage> createState() => _AttendancePageState();
-// }
-
-// class _AttendancePageState extends State<AttendancePage>
-//     with SingleTickerProviderStateMixin {
-//   late TabController _tabController;
-
-//   List<Map<String, dynamic>> _users = [];
-//   List<Map<String, dynamic>> _filteredUsers = [];
-//   List<Map<String, dynamic>> _todayAttendance = [];
-//   Map<String, dynamic>? _selectedUser;
-//   TimeOfDay? _selectedTime;
-//   final _searchController = TextEditingController();
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _tabController = TabController(length: 2, vsync: this);
-//     fetchUsers();
-//     fetchTodayAttendance();
-
-//     _searchController.addListener(() {
-//       final query = _searchController.text.toLowerCase();
-//       setState(() {
-//         _filteredUsers = _users.where((u) {
-//           return u['name'].toString().toLowerCase().contains(query) ||
-//               u['userid'].toString().toLowerCase().contains(query);
-//         }).toList();
-//       });
-//     });
-//   }
-
-//   Future<void> fetchUsers() async {
-//     final response = await Supabase.instance.client
-//         .from('users')
-//         .select()
-//         .order('name', ascending: true);
-
-//     setState(() {
-//       _users = (response as List).cast<Map<String, dynamic>>();
-//       _filteredUsers = List.from(_users);
-//     });
-//   }
-
-//   Future<void> fetchTodayAttendance() async {
-//     final now = DateTime.now();
-//     final start = DateTime(now.year, now.month, now.day);
-//     final end = start.add(const Duration(days: 1));
-
-//     final response = await Supabase.instance.client
-//         .from('attendance')
-//         .select('*, users!inner(*)') // join to get user details
-//         .gte('timestamp', start.toIso8601String())
-//         .lt('timestamp', end.toIso8601String());
-
-//     setState(() {
-//       _todayAttendance = (response as List).cast<Map<String, dynamic>>();
-//     });
-//   }
-
-//   Future<void> _pickTime(BuildContext context) async {
-//     final picked = await showTimePicker(
-//       context: context,
-//       initialTime: TimeOfDay.now(),
-//     );
-//     if (picked != null) setState(() => _selectedTime = picked);
-//   }
-
-//   Future<void> _submitAttendance() async {
-//     if (_selectedUser == null) {
-//       _showMsg('Please select a user');
-//       return;
-//     }
-
-//     final now = DateTime.now();
-//     final timestamp = _selectedTime != null
-//         ? DateTime(now.year, now.month, now.day, _selectedTime!.hour,
-//             _selectedTime!.minute)
-//         : now;
-
-//     final alreadyMarked = _todayAttendance
-//         .any((record) => record['userid'] == _selectedUser!['userid']);
-//     if (alreadyMarked) {
-//       _showMsg('${_selectedUser!['name']} is already marked.');
-//       return;
-//     }
-
-//     final weekStart = now.subtract(Duration(days: now.weekday % 7));
-
-//     try {
-//       await Supabase.instance.client.from('attendance').insert({
-//         'userid': _selectedUser!['userid'],
-//         'timestamp': timestamp.toIso8601String(),
-//         'week_start': weekStart.toIso8601String(),
-//       });
-//       _showMsg('Attendance marked for ${_selectedUser!['name']}');
-//       setState(() {
-//         _selectedUser = null;
-//         _selectedTime = null;
-//         _searchController.clear();
-//         _filteredUsers = List.from(_users);
-//       });
-//       fetchTodayAttendance();
-//     } catch (e) {
-//       _showMsg('Failed to mark attendance: $e');
-//     }
-//   }
-
-//   Future<void> _deleteAttendance(String attendanceId) async {
-//     try {
-//       await Supabase.instance.client
-//           .from('attendance')
-//           .delete()
-//           .eq('id', attendanceId);
-//       _showMsg('Attendance deleted');
-//       fetchTodayAttendance();
-//     } catch (e) {
-//       _showMsg('Failed to delete: $e');
-//     }
-//   }
-
-//   void _showMsg(String msg) {
-//     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-//   }
-
-//   bool _isUserMarked(String userid) {
-//     return _todayAttendance.any((record) => record['userid'] == userid);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Attendance'),
-//         bottom: TabBar(
-//           controller: _tabController,
-//           tabs: const [
-//             Tab(icon: Icon(Icons.person_add), text: "Mark Attendance"),
-//             Tab(icon: Icon(Icons.today), text: "Today"),
-//           ],
-//         ),
-//       ),
-//       body: TabBarView(
-//         controller: _tabController,
-//         children: [
-//           // Tab 1: Mark Attendance
-//           Padding(
-//             padding: const EdgeInsets.all(16.0),
-//             child: Column(
-//               children: [
-//                 TextField(
-//                   controller: _searchController,
-//                   decoration: const InputDecoration(
-//                     hintText: 'Search user by name or ID',
-//                     prefixIcon: Icon(Icons.search),
-//                     border: OutlineInputBorder(),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 10),
-//                 Expanded(
-//                   child: ListView.builder(
-//                     itemCount: _filteredUsers.length,
-//                     itemBuilder: (context, index) {
-//                       final user = _filteredUsers[index];
-//                       final isSelected =
-//                           _selectedUser?['userid'] == user['userid'];
-//                       final isMarked = _isUserMarked(user['userid']);
-//                       return Card(
-//                         child: ListTile(
-//                           title: Text(user['name'] ?? 'Unknown'),
-//                           subtitle: Text(
-//                               'ID: ${user['userid']} | Center: ${user['center'] ?? ''}'),
-//                           tileColor:
-//                               isSelected ? Colors.blue.withOpacity(0.1) : null,
-//                           trailing: isMarked
-//                               ? const Icon(Icons.check_circle,
-//                                   color: Colors.green)
-//                               : null,
-//                           onTap: () => setState(() => _selectedUser = user),
-//                         ),
-//                       );
-//                     },
-//                   ),
-//                 ),
-//                 ElevatedButton(
-//                   onPressed: () => _pickTime(context),
-//                   child: Text(_selectedTime == null
-//                       ? 'Select Time'
-//                       : 'Time: ${_selectedTime!.format(context)}'),
-//                 ),
-//                 const SizedBox(height: 10),
-//                 ElevatedButton(
-//                   onPressed: _submitAttendance,
-//                   child: const Text('Submit Attendance'),
-//                   style: ElevatedButton.styleFrom(
-//                       minimumSize: const Size.fromHeight(45)),
-//                 ),
-//               ],
-//             ),
-//           ),
-
-//           // Tab 2: Today’s Attendance
-//           Padding(
-//             padding: const EdgeInsets.all(16.0),
-//             child: _todayAttendance.isEmpty
-//                 ? const Center(child: Text('No attendance today'))
-//                 : ListView.builder(
-//                     itemCount: _todayAttendance.length,
-//                     itemBuilder: (context, index) {
-//                       final record = _todayAttendance[index];
-//                       final userName = record['users']?['name'] ?? 'Unknown';
-//                       final time = TimeOfDay.fromDateTime(
-//                               DateTime.parse(record['timestamp']))
-//                           .format(context);
-
-//                       return Card(
-//                         child: ListTile(
-//                           title: Text(userName),
-//                           subtitle: Text('Marked at: $time'),
-//                           leading: const Icon(Icons.check, color: Colors.green),
-//                           trailing: IconButton(
-//                             icon: const Icon(Icons.delete, color: Colors.red),
-//                             onPressed: () =>
-//                                 _deleteAttendance(record['id'].toString()),
-//                           ),
-//                         ),
-//                       );
-//                     },
-//                   ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -254,41 +12,58 @@ class _AttendancePageState extends State<AttendancePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  List<Map<String, dynamic>> _users = [];
-  List<Map<String, dynamic>> _filteredUsers = [];
+  List<Map<String, dynamic>> _sewadars = [];
+  List<Map<String, dynamic>> _filteredSewadars = [];
   List<Map<String, dynamic>> _todayAttendance = [];
-  Map<String, dynamic>? _selectedUser;
+  Map<String, dynamic>? _selectedSewadar;
   TimeOfDay? _selectedTime;
   final _searchController = TextEditingController();
+  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    fetchUsers();
+    fetchSewadars();
     fetchTodayAttendance();
 
     _searchController.addListener(() {
       final query = _searchController.text.toLowerCase();
       setState(() {
-        _filteredUsers = _users.where((u) {
-          return u['name'].toString().toLowerCase().contains(query) ||
-              u['userid'].toString().toLowerCase().contains(query);
+        _filteredSewadars = _sewadars.where((u) {
+          final name = (u['name'] ?? '').toString().toLowerCase();
+          final badge = (u['badge_number'] ?? '').toString().toLowerCase();
+          return name.contains(query) || badge.contains(query);
         }).toList();
       });
     });
   }
 
-  Future<void> fetchUsers() async {
-    final response = await Supabase.instance.client
-        .from('users')
-        .select()
-        .order('name', ascending: true);
+  Future<void> fetchSewadars() async {
+    try {
+      final response = await Supabase.instance.client
+          .from('sewadars')
+          .select()
+          .order('name', ascending: true);
 
-    setState(() {
-      _users = (response as List).cast<Map<String, dynamic>>();
-      _filteredUsers = List.from(_users);
-    });
+      if (response is List) {
+        setState(() {
+          _sewadars = response.cast<Map<String, dynamic>>();
+          _filteredSewadars = List.from(_sewadars);
+        });
+      } else {
+        setState(() {
+          _sewadars = [];
+          _filteredSewadars = [];
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to fetch sewadars: $e');
+      setState(() {
+        _sewadars = [];
+        _filteredSewadars = [];
+      });
+    }
   }
 
   Future<void> fetchTodayAttendance() async {
@@ -296,15 +71,30 @@ class _AttendancePageState extends State<AttendancePage>
     final start = DateTime(now.year, now.month, now.day);
     final end = start.add(const Duration(days: 1));
 
-    final response = await Supabase.instance.client
-        .from('attendance')
-        .select('*, users!inner(*)') // join to get user details
-        .gte('timestamp', start.toIso8601String())
-        .lt('timestamp', end.toIso8601String());
+    try {
+      final response = await Supabase.instance.client
+          .from('attendance')
+          .select(
+              'id, timestamp, sewadars(id, name, badge_number, department_sukhliya)')
+          .gte('timestamp', start.toIso8601String())
+          .lt('timestamp', end.toIso8601String());
 
-    setState(() {
-      _todayAttendance = (response as List).cast<Map<String, dynamic>>();
-    });
+      if (response is List) {
+        setState(() {
+          _todayAttendance = response.cast<Map<String, dynamic>>();
+          _loading = false;
+        });
+      } else {
+        setState(() {
+          _todayAttendance = [];
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to fetch today attendance: $e');
+      _showMsg('Failed to fetch attendance: $e');
+      setState(() => _loading = false);
+    }
   }
 
   Future<void> _pickTime(BuildContext context) async {
@@ -316,8 +106,8 @@ class _AttendancePageState extends State<AttendancePage>
   }
 
   Future<void> _submitAttendance() async {
-    if (_selectedUser == null) {
-      _showMsg('Please select a user');
+    if (_selectedSewadar == null) {
+      _showMsg('Please select a sewadar');
       return;
     }
 
@@ -327,9 +117,11 @@ class _AttendancePageState extends State<AttendancePage>
             _selectedTime!.minute)
         : now;
 
-    final alreadyMarked = _isUserMarked(_selectedUser!['userid']);
+    final sewadarId = _selectedSewadar?['id']?.toString() ?? '';
+    final alreadyMarked = _isMarked(sewadarId);
+
     if (alreadyMarked) {
-      _showMsg('${_selectedUser!['name']} is already marked.');
+      _showMsg('${_selectedSewadar?['name'] ?? "Sewadar"} is already marked.');
       return;
     }
 
@@ -337,16 +129,17 @@ class _AttendancePageState extends State<AttendancePage>
 
     try {
       await Supabase.instance.client.from('attendance').insert({
-        'userid': _selectedUser!['userid'],
+        'userid': sewadarId, // 👈 use correct FK column name
         'timestamp': timestamp.toIso8601String(),
         'week_start': weekStart.toIso8601String(),
       });
-      _showMsg('Attendance marked for ${_selectedUser!['name']}');
+      _showMsg(
+          'Attendance marked for ${_selectedSewadar?['name'] ?? "Sewadar"}');
       setState(() {
-        _selectedUser = null;
+        _selectedSewadar = null;
         _selectedTime = null;
         _searchController.clear();
-        _filteredUsers = List.from(_users);
+        _filteredSewadars = List.from(_sewadars);
       });
       fetchTodayAttendance();
     } catch (e) {
@@ -354,7 +147,8 @@ class _AttendancePageState extends State<AttendancePage>
     }
   }
 
-  Future<void> _deleteAttendance(String attendanceId) async {
+  Future<void> _deleteAttendance(String? attendanceId) async {
+    if (attendanceId == null) return;
     try {
       await Supabase.instance.client
           .from('attendance')
@@ -368,12 +162,14 @@ class _AttendancePageState extends State<AttendancePage>
   }
 
   void _showMsg(String msg) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
-  bool _isUserMarked(String userid) {
+  bool _isMarked(String sewadarId) {
+    if (sewadarId.isEmpty) return false;
     return _todayAttendance
-        .any((record) => record['users']?['userid'] == userid);
+        .any((record) => record['sewadars']?['id']?.toString() == sewadarId);
   }
 
   @override
@@ -401,44 +197,48 @@ class _AttendancePageState extends State<AttendancePage>
                 TextField(
                   controller: _searchController,
                   decoration: const InputDecoration(
-                    hintText: 'Search user by name or ID',
+                    hintText: 'Search sewadar by name or badge number',
                     prefixIcon: Icon(Icons.search),
                     border: OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 10),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: _filteredUsers.length,
-                    itemBuilder: (context, index) {
-                      final user = _filteredUsers[index];
-                      final isSelected =
-                          _selectedUser?['userid'] == user['userid'];
-                      final isMarked = _isUserMarked(user['userid']);
+                  child: _filteredSewadars.isEmpty
+                      ? const Center(child: Text("No sewadar found"))
+                      : ListView.builder(
+                          itemCount: _filteredSewadars.length,
+                          itemBuilder: (context, index) {
+                            final sewadar = _filteredSewadars[index];
+                            final id = sewadar['id']?.toString() ?? '';
+                            final isSelected =
+                                _selectedSewadar?['id']?.toString() == id;
+                            final isMarked = _isMarked(id);
 
-                      Color? bgColor;
-                      if (isSelected) {
-                        bgColor = Colors.blue.withOpacity(0.3); // selected user
-                      } else if (isMarked) {
-                        bgColor =
-                            Colors.green.withOpacity(0.2); // already marked
-                      }
+                            Color? bgColor;
+                            if (isSelected) {
+                              bgColor = Colors.blue.withOpacity(0.3);
+                            } else if (isMarked) {
+                              bgColor = Colors.green.withOpacity(0.2);
+                            }
 
-                      return Card(
-                        color: bgColor,
-                        child: ListTile(
-                          title: Text(user['name'] ?? 'Unknown'),
-                          subtitle: Text(
-                              'ID: ${user['user_id_card']} | Center: ${user['center'] ?? ''}'),
-                          trailing: isMarked
-                              ? const Icon(Icons.check_circle,
-                                  color: Colors.green)
-                              : null,
-                          onTap: () => setState(() => _selectedUser = user),
+                            return Card(
+                              color: bgColor,
+                              child: ListTile(
+                                title: Text(sewadar['name'] ?? 'Unknown'),
+                                subtitle: Text(
+                                  'Badge: ${sewadar['badge_number'] ?? "-"} | Dept: ${sewadar['department_sukhliya'] ?? ''}',
+                                ),
+                                trailing: isMarked
+                                    ? const Icon(Icons.check_circle,
+                                        color: Colors.green)
+                                    : null,
+                                onTap: () =>
+                                    setState(() => _selectedSewadar = sewadar),
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
                 ),
                 ElevatedButton(
                   onPressed: () => _pickTime(context),
@@ -449,9 +249,9 @@ class _AttendancePageState extends State<AttendancePage>
                 const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: _submitAttendance,
-                  child: const Text('Submit Attendance'),
                   style: ElevatedButton.styleFrom(
                       minimumSize: const Size.fromHeight(45)),
+                  child: const Text('Submit Attendance'),
                 ),
               ],
             ),
@@ -460,31 +260,45 @@ class _AttendancePageState extends State<AttendancePage>
           // Tab 2: Today’s Attendance
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: _todayAttendance.isEmpty
-                ? const Center(child: Text('No attendance today'))
-                : ListView.builder(
-                    itemCount: _todayAttendance.length,
-                    itemBuilder: (context, index) {
-                      final record = _todayAttendance[index];
-                      final userName = record['users']?['name'] ?? 'Unknown';
-                      final time = TimeOfDay.fromDateTime(
-                              DateTime.parse(record['timestamp']))
-                          .format(context);
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : _todayAttendance.isEmpty
+                    ? const Center(child: Text('No attendance today'))
+                    : ListView.builder(
+                        itemCount: _todayAttendance.length,
+                        itemBuilder: (context, index) {
+                          final record = _todayAttendance[index];
+                          final sewadar = record['sewadars'] ?? {};
+                          final sewadarName = sewadar['name'] ?? 'Unknown';
+                          final timestamp = record['timestamp'];
+                          String time = '';
+                          if (timestamp != null) {
+                            try {
+                              time = TimeOfDay.fromDateTime(
+                                      DateTime.parse(timestamp.toString()))
+                                  .format(context);
+                            } catch (_) {
+                              time = '';
+                            }
+                          }
 
-                      return Card(
-                        child: ListTile(
-                          title: Text(userName),
-                          subtitle: Text('Marked at: $time'),
-                          leading: const Icon(Icons.check, color: Colors.green),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () =>
-                                _deleteAttendance(record['id'].toString()),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                          return Card(
+                            child: ListTile(
+                              title: Text(sewadarName),
+                              subtitle: Text(
+                                  time.isNotEmpty ? 'Marked at: $time' : ''),
+                              leading:
+                                  const Icon(Icons.check, color: Colors.green),
+                              trailing: IconButton(
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () =>
+                                    _deleteAttendance(record['id']?.toString()),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
           ),
         ],
       ),

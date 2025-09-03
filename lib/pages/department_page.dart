@@ -1,87 +1,5 @@
-// import 'package:flutter/material.dart';
-// import 'package:hive_flutter/hive_flutter.dart';
-
-// class DepartmentPage extends StatefulWidget {
-//   @override
-//   _DepartmentPageState createState() => _DepartmentPageState();
-// }
-
-// class _DepartmentPageState extends State<DepartmentPage> {
-//   late Box<String> _departmentBox;
-//   final TextEditingController _controller = TextEditingController();
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _departmentBox = Hive.box<String>('departments');
-//   }
-
-//   void _addDepartment(String dept) {
-//     if (dept.trim().isEmpty) return;
-
-//     if (!_departmentBox.values.contains(dept)) {
-//       _departmentBox.add(dept);
-//     }
-
-//     _controller.clear();
-//   }
-
-//   void _deleteDepartment(int index) {
-//     _departmentBox.deleteAt(index);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: Text('Departments')),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16),
-//         child: Column(
-//           children: [
-//             TextField(
-//               controller: _controller,
-//               decoration: InputDecoration(
-//                 labelText: 'Add Department',
-//                 suffixIcon: IconButton(
-//                   icon: Icon(Icons.add),
-//                   onPressed: () => _addDepartment(_controller.text),
-//                 ),
-//               ),
-//             ),
-//             SizedBox(height: 20),
-//             Expanded(
-//               child: ValueListenableBuilder<Box<String>>(
-//                 valueListenable:
-//                     _departmentBox.listenable(), // ✅ This works now
-//                 builder: (context, box, _) {
-//                   if (box.values.isEmpty) {
-//                     return Center(child: Text('No departments added.'));
-//                   }
-
-//                   return ListView.builder(
-//                     itemCount: box.length,
-//                     itemBuilder: (context, index) {
-//                       final department = box.getAt(index);
-//                       return ListTile(
-//                         title: Text(department ?? ''),
-//                         trailing: IconButton(
-//                           icon: Icon(Icons.delete, color: Colors.red),
-//                           onPressed: () => _deleteDepartment(index),
-//                         ),
-//                       );
-//                     },
-//                   );
-//                 },
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'api_service.dart';
 
 class DepartmentPage extends StatefulWidget {
   const DepartmentPage({super.key});
@@ -100,42 +18,65 @@ class _DepartmentPageState extends State<DepartmentPage> {
     fetchDepartments();
   }
 
+  /// ✅ Fetch all departments
   Future<void> fetchDepartments() async {
-    final response = await Supabase.instance.client
-        .from('departments')
-        .select()
-        .order('name', ascending: true);
-
-    setState(() {
-      _departments = (response as List).cast<Map<String, dynamic>>();
-    });
-  }
-
-  Future<void> _addDepartment(String dept) async {
-    if (dept.trim().isEmpty) return;
-
-    // Check if already exists
-    final exists = _departments.any((d) => d['name'] == dept);
-    if (exists) return;
-
     try {
-      await Supabase.instance.client.from('departments').insert({
-        'name': dept
-      }).select(); // <- important to add .select() to return inserted row
-
-      _controller.clear();
-      fetchDepartments(); // refresh list
+      final response = await ApiService.getDepartments();
+      setState(() {
+        _departments = response.cast<Map<String, dynamic>>();
+      });
     } catch (e) {
-      debugPrint('❌ Failed to insert department: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to add department: $e')),
-      );
+      debugPrint('❌ Failed to load departments: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load departments: $e')),
+        );
+      }
     }
   }
 
-  Future<void> _deleteDepartment(String id) async {
-    await Supabase.instance.client.from('departments').delete().eq('id', id);
-    fetchDepartments(); // refresh list
+  /// ✅ Add new department
+  Future<void> _addDepartment(String dept) async {
+    if (dept.trim().isEmpty) return;
+
+    // check duplicate in current list
+    final exists = _departments.any(
+      (d) => (d['name'] as String).toLowerCase() == dept.toLowerCase(),
+    );
+    if (exists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Department already exists")),
+      );
+      return;
+    }
+
+    try {
+      await ApiService.addDepartment(dept);
+      _controller.clear();
+      fetchDepartments();
+    } catch (e) {
+      debugPrint('❌ Failed to add department: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add department: $e')),
+        );
+      }
+    }
+  }
+
+  /// ✅ Delete department
+  Future<void> _deleteDepartment(int id) async {
+    try {
+      await ApiService.deleteDepartment(id);
+      fetchDepartments();
+    } catch (e) {
+      debugPrint('❌ Failed to delete department: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete department: $e')),
+        );
+      }
+    }
   }
 
   @override
@@ -146,6 +87,7 @@ class _DepartmentPageState extends State<DepartmentPage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            // ➕ Add Department Field
             TextField(
               controller: _controller,
               decoration: InputDecoration(
@@ -157,19 +99,21 @@ class _DepartmentPageState extends State<DepartmentPage> {
               ),
             ),
             const SizedBox(height: 20),
+
+            // 📋 Department List
             Expanded(
               child: _departments.isEmpty
                   ? const Center(child: Text('No departments added.'))
                   : ListView.builder(
                       itemCount: _departments.length,
                       itemBuilder: (context, index) {
-                        final department = _departments[index];
+                        final dept = _departments[index];
                         return ListTile(
-                          title: Text(department['name'] ?? ''),
+                          title: Text(dept['name'] ?? ''),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () =>
-                                _deleteDepartment(department['id'].toString()),
+                                _deleteDepartment(dept['id'] as int),
                           ),
                         );
                       },

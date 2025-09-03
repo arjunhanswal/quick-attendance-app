@@ -1,5 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'api_service.dart';
 
 class UserListPage extends StatefulWidget {
   const UserListPage({super.key});
@@ -9,30 +10,76 @@ class UserListPage extends StatefulWidget {
 }
 
 class _UserListPageState extends State<UserListPage> {
+  // Future<List<Map<String, dynamic>>> fetchUsers() async {
+  //   try {
+  //     final response = await ApiService.getSewadars();
+
+  //     return response.map<Map<String, dynamic>>((item) {
+  //       Map<String, dynamic> parsedData = {};
+
+  //       try {
+  //         if (item['data'] != null) {
+  //           final rawData = item['data'];
+
+  //           // If it's already a String (like in your response), decode it
+  //           if (rawData is String) {
+  //             parsedData = jsonDecode(rawData);
+  //           }
+  //           // If API ever sends a Map directly, keep it
+  //           else if (rawData is Map) {
+  //             parsedData = Map<String, dynamic>.from(rawData);
+  //           }
+  //         }
+  //       } catch (e) {
+  //         debugPrint("⚠️ JSON decode failed for sid=${item['sid']}: $e");
+  //       }
+
+  //       // Convert all values to String to avoid type issues in UI
+  //       parsedData = parsedData.map(
+  //           (key, value) => MapEntry(key.toString(), value?.toString() ?? ""));
+
+  //       return {
+  //         "sid": item['sid'].toString(),
+  //         "created_at": item['created_at']?.toString() ?? "",
+  //         "status": item['status']?.toString() ?? "",
+  //         ...parsedData,
+  //       };
+  //     }).toList();
+  //   } catch (e) {
+  //     debugPrint("❌ Failed to fetch users: $e");
+  //     return [];
+  //   }
+  // }
   Future<List<Map<String, dynamic>>> fetchUsers() async {
-    final response = await Supabase.instance.client
-        .from('sewadars')
-        .select()
-        .order('created_at', ascending: false);
-    return response as List<Map<String, dynamic>>;
+    try {
+      final response = await ApiService.getSewadars();
+
+      return response.map<Map<String, dynamic>>((item) {
+        // since getSewadars already decodes `data`, just merge directly
+        final userMap = {
+          "sid": item['sid']?.toString() ?? "",
+          "created_at": item['created_at']?.toString() ?? "",
+          "status": item['status']?.toString() ?? "",
+          ...item, // item already contains parsed fields like sewadar_name, badge_no etc
+        };
+
+        print("✅ Parsed user: $userMap"); // use print instead of debugPrint
+        return userMap;
+      }).toList();
+    } catch (e) {
+      print("❌ Failed to fetch users: $e");
+      return [];
+    }
   }
 
   Future<void> deleteUser(String id, String sewadarName) async {
     try {
-      // delete attendance first (if you have attendance table linked by sewadar_id)
-      await Supabase.instance.client
-          .from('attendance')
-          .delete()
-          .eq('sewadar_id', id);
-
-      // delete from sewadars
-      await Supabase.instance.client.from('sewadars').delete().eq('id', id);
-
+      await ApiService.deleteSewadar(id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('User "$sewadarName" and attendance deleted')),
+          SnackBar(content: Text('User "$sewadarName" deleted successfully')),
         );
-        setState(() {}); // refresh UI
+        setState(() {}); // refresh list
       }
     } catch (e) {
       if (mounted) {
@@ -41,6 +88,29 @@ class _UserListPageState extends State<UserListPage> {
         );
       }
     }
+  }
+
+  Map<String, dynamic> safeDecode(dynamic raw) {
+    if (raw == null) return {};
+    try {
+      if (raw is String) {
+        // First decode
+        final first = jsonDecode(raw);
+
+        // If still string, decode again
+        if (first is String) {
+          return jsonDecode(first);
+        }
+        if (first is Map) {
+          return Map<String, dynamic>.from(first);
+        }
+      } else if (raw is Map) {
+        return Map<String, dynamic>.from(raw);
+      }
+    } catch (e) {
+      debugPrint("❌ safeDecode failed: $e");
+    }
+    return {};
   }
 
   @override
@@ -56,6 +126,7 @@ class _UserListPageState extends State<UserListPage> {
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
+
           final users = snapshot.data ?? [];
           if (users.isEmpty) {
             return const Center(child: Text('No users added yet.'));
@@ -65,27 +136,28 @@ class _UserListPageState extends State<UserListPage> {
             itemCount: users.length,
             itemBuilder: (context, index) {
               final user = users[index];
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Colors.blueAccent,
-                  child: Text(
-                    (user['name'] as String?)?.isNotEmpty == true
-                        ? user['name'][0].toUpperCase()
-                        : '?',
-                    style: const TextStyle(color: Colors.white),
+              final name = user['sewadar_name'] ?? '';
+              final badge = user['badge_no'] ?? '';
+              final dept0 = user['dept_id0']?.toString() ?? '';
+              final mobile = user['mobile_self'] ?? '';
+
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.deepPurple,
+                    child: Text(
+                      name.isNotEmpty ? name[0].toUpperCase() : '?',
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ),
-                ),
-                title: Text(user['name'] ?? ''),
-                subtitle: Text(
-                  'Badge: ${user['badge_number'] ?? ''}, '
-                  'Sukhliya Dept: ${user['department_sukhliya'] ?? ''}, '
-                  'Mobile: ${user['mobile_self'] ?? ''}',
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () => deleteUser(
-                    user['id'],
-                    user['sewadar_name'] ?? '',
+                  title: Text(name),
+                  subtitle: Text(
+                    'Badge: $badge, Dept: $dept0, Mobile: $mobile',
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => deleteUser(user['sid'].toString(), name),
                   ),
                 ),
               );
@@ -95,7 +167,9 @@ class _UserListPageState extends State<UserListPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/add-user-new');
+          Navigator.pushNamed(context, '/add-user-new').then((_) {
+            setState(() {}); // refresh after adding
+          });
         },
         backgroundColor: Colors.deepPurple,
         child: const Icon(Icons.add),

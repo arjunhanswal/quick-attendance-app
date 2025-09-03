@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'api_service.dart';
 
 class AttendancePage extends StatefulWidget {
   const AttendancePage({super.key});
@@ -41,24 +42,26 @@ class _AttendancePageState extends State<AttendancePage>
 
   Future<void> fetchSewadars() async {
     try {
-      final response = await Supabase.instance.client
-          .from('sewadars')
-          .select()
-          .order('name', ascending: true);
+      final response = await ApiService.getSewadars();
 
-      if (response is List) {
-        setState(() {
-          _sewadars = response.cast<Map<String, dynamic>>();
-          _filteredSewadars = List.from(_sewadars);
-        });
-      } else {
-        setState(() {
-          _sewadars = [];
-          _filteredSewadars = [];
-        });
-      }
+      final users = response.map<Map<String, dynamic>>((item) {
+        final userMap = {
+          "sid": item['sid']?.toString() ?? "",
+          "created_at": item['created_at']?.toString() ?? "",
+          "status": item['status']?.toString() ?? "",
+          ...item, // already contains parsed fields like sewadar_name, badge_no etc
+        };
+
+        print("✅ Parsed user: $userMap"); // logs parsed user
+        return userMap;
+      }).toList();
+
+      setState(() {
+        _sewadars = users;
+        _filteredSewadars = List.from(_sewadars);
+      });
     } catch (e) {
-      debugPrint('❌ Failed to fetch sewadars: $e');
+      print("❌ Failed to fetch sewadars: $e");
       setState(() {
         _sewadars = [];
         _filteredSewadars = [];
@@ -105,17 +108,52 @@ class _AttendancePageState extends State<AttendancePage>
     if (picked != null) setState(() => _selectedTime = picked);
   }
 
+  // Future<void> _submitAttendance() async {
+  //   if (_selectedSewadar == null) {
+  //     _showMsg('Please select a sewadar');
+  //     return;
+  //   }
+
+  //   final now = DateTime.now();
+  //   final timestamp = _selectedTime != null
+  //       ? DateTime(now.year, now.month, now.day, _selectedTime!.hour,
+  //           _selectedTime!.minute)
+  //       : now;
+
+  //   final sewadarId = _selectedSewadar?['id']?.toString() ?? '';
+  //   final alreadyMarked = _isMarked(sewadarId);
+
+  //   if (alreadyMarked) {
+  //     _showMsg('${_selectedSewadar?['name'] ?? "Sewadar"} is already marked.');
+  //     return;
+  //   }
+
+  //   final weekStart = now.subtract(Duration(days: now.weekday % 7));
+
+  //   try {
+  //     await Supabase.instance.client.from('attendance').insert({
+  //       'userid': sewadarId, // 👈 use correct FK column name
+  //       'timestamp': timestamp.toIso8601String(),
+  //       'week_start': weekStart.toIso8601String(),
+  //     });
+  //     _showMsg(
+  //         'Attendance marked for ${_selectedSewadar?['name'] ?? "Sewadar"}');
+  //     setState(() {
+  //       _selectedSewadar = null;
+  //       _selectedTime = null;
+  //       _searchController.clear();
+  //       _filteredSewadars = List.from(_sewadars);
+  //     });
+  //     fetchTodayAttendance();
+  //   } catch (e) {
+  //     _showMsg('Failed to mark attendance: $e');
+  //   }
+  // }
   Future<void> _submitAttendance() async {
     if (_selectedSewadar == null) {
       _showMsg('Please select a sewadar');
       return;
     }
-
-    final now = DateTime.now();
-    final timestamp = _selectedTime != null
-        ? DateTime(now.year, now.month, now.day, _selectedTime!.hour,
-            _selectedTime!.minute)
-        : now;
 
     final sewadarId = _selectedSewadar?['id']?.toString() ?? '';
     final alreadyMarked = _isMarked(sewadarId);
@@ -125,14 +163,13 @@ class _AttendancePageState extends State<AttendancePage>
       return;
     }
 
-    final weekStart = now.subtract(Duration(days: now.weekday % 7));
-
     try {
-      await Supabase.instance.client.from('attendance').insert({
-        'userid': sewadarId, // 👈 use correct FK column name
-        'timestamp': timestamp.toIso8601String(),
-        'week_start': weekStart.toIso8601String(),
-      });
+      // 👇 Call API service
+      await ApiService.addAttendance(
+        sid: int.parse(sewadarId),
+        attendance: "Present",
+      );
+
       _showMsg(
           'Attendance marked for ${_selectedSewadar?['name'] ?? "Sewadar"}');
       setState(() {
@@ -141,7 +178,7 @@ class _AttendancePageState extends State<AttendancePage>
         _searchController.clear();
         _filteredSewadars = List.from(_sewadars);
       });
-      fetchTodayAttendance();
+      fetchTodayAttendance(); // refresh
     } catch (e) {
       _showMsg('Failed to mark attendance: $e');
     }
@@ -210,9 +247,9 @@ class _AttendancePageState extends State<AttendancePage>
                           itemCount: _filteredSewadars.length,
                           itemBuilder: (context, index) {
                             final sewadar = _filteredSewadars[index];
-                            final id = sewadar['id']?.toString() ?? '';
+                            final id = sewadar['sid']?.toString() ?? '';
                             final isSelected =
-                                _selectedSewadar?['id']?.toString() == id;
+                                _selectedSewadar?['sid']?.toString() == id;
                             final isMarked = _isMarked(id);
 
                             Color? bgColor;
@@ -225,9 +262,10 @@ class _AttendancePageState extends State<AttendancePage>
                             return Card(
                               color: bgColor,
                               child: ListTile(
-                                title: Text(sewadar['name'] ?? 'Unknown'),
+                                title:
+                                    Text(sewadar['sewadar_name'] ?? 'Unknown'),
                                 subtitle: Text(
-                                  'Badge: ${sewadar['badge_number'] ?? "-"} | Dept: ${sewadar['department_sukhliya'] ?? ''}',
+                                  'Badge: ${sewadar['badge_no'] ?? "-"} | Dept: ${sewadar['dept_id0'] ?? ""}',
                                 ),
                                 trailing: isMarked
                                     ? const Icon(Icons.check_circle,
@@ -257,7 +295,7 @@ class _AttendancePageState extends State<AttendancePage>
             ),
           ),
 
-          // Tab 2: Today’s Attendance
+          // Tab 2: Today's Attendance
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: _loading
@@ -269,7 +307,9 @@ class _AttendancePageState extends State<AttendancePage>
                         itemBuilder: (context, index) {
                           final record = _todayAttendance[index];
                           final sewadar = record['sewadars'] ?? {};
-                          final sewadarName = sewadar['name'] ?? 'Unknown';
+                          final sewadarName =
+                              sewadar['sewadar_name'] ?? 'Unknown';
+                          final badge = sewadar['badge_no'] ?? '-';
                           final timestamp = record['timestamp'];
                           String time = '';
                           if (timestamp != null) {
@@ -286,7 +326,7 @@ class _AttendancePageState extends State<AttendancePage>
                             child: ListTile(
                               title: Text(sewadarName),
                               subtitle: Text(
-                                  time.isNotEmpty ? 'Marked at: $time' : ''),
+                                  'Badge: $badge${time.isNotEmpty ? ' | Marked at: $time' : ""}'),
                               leading:
                                   const Icon(Icons.check, color: Colors.green),
                               trailing: IconButton(

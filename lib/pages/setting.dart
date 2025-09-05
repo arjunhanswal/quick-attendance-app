@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'session_manager.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -51,11 +52,16 @@ class SettingsPage extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.logout),
             title: Text('Logout'),
-            onTap: () {
-              // Implement logout functionality here
-              Navigator.pop(context);
+            onTap: () async {
+              // ✅ Clear session
+              await SessionManager.clearSession();
+
+              // ✅ Navigate to login page
+              Navigator.pushReplacementNamed(context, '/login');
+
+              // ✅ Optional: show confirmation
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Logged out')),
+                const SnackBar(content: Text('Logged out')),
               );
             },
           ),

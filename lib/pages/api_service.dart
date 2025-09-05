@@ -93,27 +93,16 @@ class ApiService {
     }
   }
 
-  /// ✏️ Update sewadar
   static Future<void> updateSewadar(
-    int id, {
-    String? name,
-    String? email,
-    int? deptId0,
-    int? deptId1,
-  }) async {
+      String id, Map<String, dynamic> data) async {
     final response = await http.put(
-      Uri.parse("$baseUrl/sewadar/$id"),
+      Uri.parse('$baseUrl/sewadar/$id'),
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        if (name != null) "name": name,
-        if (email != null) "email": email,
-        if (deptId0 != null) "dept_id0": deptId0,
-        if (deptId1 != null) "dept_id1": deptId1,
-      }),
+      body: jsonEncode({"data": data}),
     );
 
     if (response.statusCode != 200) {
-      throw Exception("Failed to update sewadar with id=$id");
+      throw Exception('Failed to update Sewadar: ${response.body}');
     }
   }
 
@@ -202,6 +191,26 @@ class ApiService {
     } catch (e) {
       debugPrint("❌ POST error $endpoint: $e");
       rethrow;
+    }
+  }
+
+  // 🔹 Login Function
+  static Future<Map<String, dynamic>> login(
+      String username, String password) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/login"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "username": username,
+        "password": password,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data; // will contain success + user/message
+    } else {
+      throw Exception("Failed to login: ${response.statusCode}");
     }
   }
 }

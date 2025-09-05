@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dashboard_page.dart';
 import 'attendance_page.dart';
 import 'report_page.dart';
@@ -30,7 +29,6 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _logout() async {
     try {
-      await Supabase.instance.client.auth.signOut();
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/login'); // redirect to login
     } catch (e) {
@@ -42,8 +40,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Supabase.instance.client.auth.currentUser;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(_getTitle()),
@@ -90,7 +86,7 @@ class _HomePageState extends State<HomePage> {
                     style: const TextStyle(color: Colors.white, fontSize: 18),
                   ),
                   Text(
-                    user?.email ?? "Admin",
+                    "Admin",
                     style: const TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                 ],

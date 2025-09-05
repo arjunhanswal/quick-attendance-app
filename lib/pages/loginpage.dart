@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'api_service.dart';
+import 'session_manager.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -7,7 +8,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _loading = false;
 
@@ -15,22 +16,29 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _loading = true);
 
     try {
-      final supabase = Supabase.instance.client;
+      final data = await ApiService.login(
+        _usernameController.text.trim(),
+        _passwordController.text.trim(),
+      );
 
-      final response = await supabase
-          .from('login')
-          .select()
-          .eq('username', _emailController.text.trim())
-          .eq('password', _passwordController.text.trim())
-          .maybeSingle();
-
-      if (response != null) {
+      if (data["success"] == true) {
         // ✅ Successful login
-        Navigator.pushReplacementNamed(context, '/');
+        final user = data["user"];
+        print("Logged in user: $user");
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Welcome ${user["username"]}!")),
+        );
+        if (data["success"] == true) {
+          final user = data["user"];
+          await SessionManager.saveUser(user);
+          await SessionManager.saveUser(user['user']);
+          Navigator.pushReplacementNamed(context, '/');
+        }
       } else {
         // ❌ Invalid login
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Invalid credentials")),
+          SnackBar(content: Text(data["message"] ?? "Invalid credentials")),
         );
       }
     } catch (e) {
@@ -47,70 +55,45 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
-          // ✅ Scrollable for small screens
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // 🔹 App Logo
-                Image.asset(
-                  "assets/images/logo.png", // ✅ Add your logo here
-                  height: 100,
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset("assets/images/logo.png", height: 100),
+              const SizedBox(height: 16),
+              const Text("Attendance App",
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 40),
+              const Text("Login",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _usernameController,
+                decoration: const InputDecoration(
+                  labelText: "Username",
+                  border: OutlineInputBorder(),
                 ),
-                const SizedBox(height: 16),
-
-                // 🔹 App Name
-                const Text(
-                  "Attendance App",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _passwordController,
+                decoration: const InputDecoration(
+                  labelText: "Password",
+                  border: OutlineInputBorder(),
                 ),
-                const SizedBox(height: 40),
-
-                // 🔹 Login Title
-                const Text(
-                  "Login",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 20),
-
-                // 🔹 Username Input
-                TextField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: "Username",
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // 🔹 Password Input
-                TextField(
-                  controller: _passwordController,
-                  decoration: const InputDecoration(
-                    labelText: "Password",
-                    border: OutlineInputBorder(),
-                  ),
-                  obscureText: true,
-                ),
-                const SizedBox(height: 20),
-
-                // 🔹 Login Button
-                _loading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: _login,
-                        style: ElevatedButton.styleFrom(
-                          minimumSize:
-                              const Size(double.infinity, 48), // Full width
-                        ),
-                        child: const Text("Login"),
+                obscureText: true,
+              ),
+              const SizedBox(height: 20),
+              _loading
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                      onPressed: _login,
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 48),
                       ),
-              ],
-            ),
+                      child: const Text("Login"),
+                    ),
+            ],
           ),
         ),
       ),

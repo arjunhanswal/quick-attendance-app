@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'api_service.dart';
+import 'add_user_page_new.dart';
 
 class UserListPage extends StatefulWidget {
   const UserListPage({super.key});
@@ -10,46 +11,6 @@ class UserListPage extends StatefulWidget {
 }
 
 class _UserListPageState extends State<UserListPage> {
-  // Future<List<Map<String, dynamic>>> fetchUsers() async {
-  //   try {
-  //     final response = await ApiService.getSewadars();
-
-  //     return response.map<Map<String, dynamic>>((item) {
-  //       Map<String, dynamic> parsedData = {};
-
-  //       try {
-  //         if (item['data'] != null) {
-  //           final rawData = item['data'];
-
-  //           // If it's already a String (like in your response), decode it
-  //           if (rawData is String) {
-  //             parsedData = jsonDecode(rawData);
-  //           }
-  //           // If API ever sends a Map directly, keep it
-  //           else if (rawData is Map) {
-  //             parsedData = Map<String, dynamic>.from(rawData);
-  //           }
-  //         }
-  //       } catch (e) {
-  //         debugPrint("⚠️ JSON decode failed for sid=${item['sid']}: $e");
-  //       }
-
-  //       // Convert all values to String to avoid type issues in UI
-  //       parsedData = parsedData.map(
-  //           (key, value) => MapEntry(key.toString(), value?.toString() ?? ""));
-
-  //       return {
-  //         "sid": item['sid'].toString(),
-  //         "created_at": item['created_at']?.toString() ?? "",
-  //         "status": item['status']?.toString() ?? "",
-  //         ...parsedData,
-  //       };
-  //     }).toList();
-  //   } catch (e) {
-  //     debugPrint("❌ Failed to fetch users: $e");
-  //     return [];
-  //   }
-  // }
   Future<List<Map<String, dynamic>>> fetchUsers() async {
     try {
       final response = await ApiService.getSewadars();
@@ -141,6 +102,26 @@ class _UserListPageState extends State<UserListPage> {
               final dept0 = user['dept_id0']?.toString() ?? '';
               final mobile = user['mobile_self'] ?? '';
 
+              // return Card(
+              //   margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              //   child: ListTile(
+              //     leading: CircleAvatar(
+              //       backgroundColor: Colors.deepPurple,
+              //       child: Text(
+              //         name.isNotEmpty ? name[0].toUpperCase() : '?',
+              //         style: const TextStyle(color: Colors.white),
+              //       ),
+              //     ),
+              //     title: Text(name),
+              //     subtitle: Text(
+              //       'Badge: $badge, Dept: $dept0, Mobile: $mobile',
+              //     ),
+              //     trailing: IconButton(
+              //       icon: const Icon(Icons.delete, color: Colors.red),
+              //       onPressed: () => deleteUser(user['sid'].toString(), name),
+              //     ),
+              //   ),
+              // );
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                 child: ListTile(
@@ -152,13 +133,21 @@ class _UserListPageState extends State<UserListPage> {
                     ),
                   ),
                   title: Text(name),
-                  subtitle: Text(
-                    'Badge: $badge, Dept: $dept0, Mobile: $mobile',
-                  ),
+                  subtitle:
+                      Text('Badge: $badge, Dept: $dept0, Mobile: $mobile'),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () => deleteUser(user['sid'].toString(), name),
                   ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            AddUserPageNew(isEdit: true, userData: user),
+                      ),
+                    ).then((_) => setState(() {})); // refresh after update
+                  },
                 ),
               );
             },

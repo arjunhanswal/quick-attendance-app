@@ -1,243 +1,194 @@
-// // import 'dart:io';
-// import 'package:flutter/material.dart';
-// import 'package:intl/intl.dart';
-// import 'package:supabase_flutter/supabase_flutter.dart';
-// import 'package:path_provider/path_provider.dart';
-// import 'package:share_plus/share_plus.dart';
-// import 'package:csv/csv.dart';
-
-// class ReportPage extends StatefulWidget {
-//   const ReportPage({super.key});
-
-//   @override
-//   State<ReportPage> createState() => _ReportPageState();
-// }
-
-// class _ReportPageState extends State<ReportPage> {
-//   Set<DateTime> _selectedDates = {};
-//   List<Map<String, dynamic>> _attendanceRecords = [];
-//   List<Map<String, dynamic>> _users = [];
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     fetchUsers();
-//     fetchAttendance();
-//   }
-
-//   Future<void> fetchUsers() async {
-//     final response = await Supabase.instance.client.from('users').select();
-//     setState(() {
-//       _users = (response as List).cast<Map<String, dynamic>>();
-//     });
-//   }
-
-//   Future<void> fetchAttendance() async {
-//     final response = await Supabase.instance.client
-//         .from('attendance')
-//         .select('*, users(*)'); // optional join to get user info
-//     setState(() {
-//       _attendanceRecords = (response as List).cast<Map<String, dynamic>>();
-//     });
-//   }
-
-//   List<Map<String, dynamic>> getFilteredRecords() {
-//     if (_selectedDates.isEmpty) return _attendanceRecords;
-
-//     return _attendanceRecords.where((record) {
-//       final date = DateTime.parse(record['timestamp']);
-//       final dateOnly = DateTime(date.year, date.month, date.day);
-//       return _selectedDates.contains(dateOnly);
-//     }).toList()
-//       ..sort((a, b) =>
-//           DateTime.parse(a['timestamp']).compareTo(DateTime.parse(b['timestamp'])));
-//   }
-
-//   Future<void> _pickDate(BuildContext context) async {
-//     final picked = await showDatePicker(
-//       context: context,
-//       initialDate: DateTime.now(),
-//       firstDate: DateTime(2023),
-//       lastDate: DateTime.now(),
-//     );
-//     if (picked != null) {
-//       final pickedDateOnly = DateTime(picked.year, picked.month, picked.day);
-//       setState(() {
-//         if (_selectedDates.contains(pickedDateOnly)) {
-//           _selectedDates.remove(pickedDateOnly);
-//         } else {
-//           _selectedDates.add(pickedDateOnly);
-//         }
-//       });
-//     }
-//   }
-
-//   Future<void> _exportToCSV(List<Map<String, dynamic>> records) async {
-//     List<List<String>> csvData = [
-//       ['Name', 'User ID', 'Center', 'Department', 'Timestamp']
-//     ];
-
-//     for (var record in records) {
-//       final user = record['users'] ?? {};
-//       csvData.add([
-//         user['name'] ?? 'Unknown',
-//         user['userId'] ?? '',
-//         user['center'] ?? '',
-//         user['department'] ?? '',
-//         DateFormat('yyyy-MM-dd HH:mm')
-//             .format(DateTime.parse(record['timestamp'])),
-//       ]);
-//     }
-
-//     final directory = await getTemporaryDirectory();
-//     final path =
-//         '${directory.path}/attendance_report_${DateTime.now().millisecondsSinceEpoch}.csv';
-//     final file = File(path);
-//     String csv = const ListToCsvConverter().convert(csvData);
-//     await file.writeAsString(csv);
-
-//     await Share.shareXFiles([XFile(file.path)],
-//         text: 'Here is the exported attendance report CSV');
-
-//     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-//       content: Text('Exported and ready to share!'),
-//       duration: Duration(seconds: 2),
-//     ));
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final records = getFilteredRecords();
-
-//     return Scaffold(
-//       appBar: AppBar(title: const Text("Attendance Report")),
-//       body: Column(
-//         children: [
-//           const SizedBox(height: 10),
-
-//           // 🔘 Filter Buttons
-//           Padding(
-//             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//             child: Row(
-//               children: [
-//                 ElevatedButton.icon(
-//                   onPressed: () => _pickDate(context),
-//                   icon: const Icon(Icons.date_range),
-//                   label: const Text("Select Date"),
-//                 ),
-//                 const SizedBox(width: 10),
-//                 ElevatedButton.icon(
-//                   onPressed: () => _exportToCSV(records),
-//                   icon: const Icon(Icons.download),
-//                   label: const Text("Export CSV"),
-//                 ),
-//                 const Spacer(),
-//                 if (_selectedDates.isNotEmpty)
-//                   TextButton(
-//                     onPressed: () {
-//                       setState(() {
-//                         _selectedDates.clear();
-//                       });
-//                     },
-//                     child: const Text("Clear"),
-//                   ),
-//               ],
-//             ),
-//           ),
-
-//           const SizedBox(height: 10),
-
-//           // 📅 Selected Dates Chips
-//           if (_selectedDates.isNotEmpty)
-//             Wrap(
-//               spacing: 8,
-//               runSpacing: 4,
-//               children: _selectedDates.map((date) {
-//                 return Chip(
-//                   label: Text(DateFormat('dd MMM').format(date)),
-//                   deleteIcon: const Icon(Icons.close),
-//                   onDeleted: () {
-//                     setState(() {
-//                       _selectedDates.remove(date);
-//                     });
-//                   },
-//                 );
-//               }).toList(),
-//             ),
-
-//           const SizedBox(height: 10),
-
-//           // 📊 Attendance Table
-//           Expanded(
-//             child: SingleChildScrollView(
-//               scrollDirection: Axis.horizontal,
-//               child: SingleChildScrollView(
-//                 child: DataTable(
-//                   columns: const [
-//                     DataColumn(label: Text('Name')),
-//                     DataColumn(label: Text('User ID')),
-//                     DataColumn(label: Text('Center')),
-//                     DataColumn(label: Text('Department')),
-//                     DataColumn(label: Text('Date')),
-//                     DataColumn(label: Text('Time')),
-//                   ],
-//                   rows: records.map((record) {
-//                     final user = record['users'] ?? {};
-//                     final timestamp = DateTime.parse(record['timestamp']);
-//                     final dateStr = DateFormat('yyyy-MM-dd').format(timestamp);
-//                     final timeStr = DateFormat('HH:mm').format(timestamp);
-
-//                     return DataRow(cells: [
-//                       DataCell(Text(user['name'] ?? 'Unknown')),
-//                       DataCell(Text(user['userId'] ?? '')),
-//                       DataCell(Text(user['center'] ?? '')),
-//                       DataCell(Text(user['department'] ?? '')),
-//                       DataCell(Text(dateStr)),
-//                       DataCell(Text(timeStr)),
-//                     ]);
-//                   }).toList(),
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:csv/csv.dart';
+import 'api_service.dart';
 
-class ReportPage extends StatelessWidget {
+class ReportPage extends StatefulWidget {
   const ReportPage({super.key});
+
+  @override
+  State<ReportPage> createState() => _ReportPageState();
+}
+
+class _ReportPageState extends State<ReportPage> {
+  DateTimeRange? _selectedRange;
+  List<Map<String, dynamic>> presentUsers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDashboard();
+  }
+
+  Future<void> fetchDashboard() async {
+    try {
+      final from = _selectedRange?.start ?? DateTime.now();
+      final to = _selectedRange?.end ?? DateTime.now();
+
+      final fromStr = DateFormat("yyyy-MM-dd").format(from);
+      final toStr = DateFormat("yyyy-MM-dd").format(to);
+
+      final response = await ApiService.post(
+        "/dashboard?from=$fromStr&to=$toStr",
+        body: {},
+      );
+
+      final data = Map<String, dynamic>.from(response ?? {});
+
+      setState(() {
+        final rawPresentUsers = data['present_users'];
+        if (rawPresentUsers != null && rawPresentUsers is List) {
+          presentUsers = rawPresentUsers
+              .where((e) => e is Map)
+              .map((e) => Map<String, dynamic>.from(e as Map))
+              .toList();
+        } else {
+          presentUsers = [];
+        }
+      });
+
+      debugPrint("📋 Report users: ${jsonEncode(presentUsers)}");
+    } catch (e, st) {
+      debugPrint("❌ Error fetching report: $e\n$st");
+      setState(() {
+        presentUsers = [];
+      });
+    }
+  }
+
+  Future<void> _pickDateRange() async {
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2024),
+      lastDate: DateTime.now(),
+      initialDateRange: _selectedRange ??
+          DateTimeRange(start: DateTime.now(), end: DateTime.now()),
+    );
+    if (picked != null) {
+      setState(() => _selectedRange = picked);
+      await fetchDashboard();
+    }
+  }
+
+  Future<void> _exportToCSV() async {
+    List<List<String>> csvData = [
+      ['Sewadar Name', 'Badge No', 'Mobile', 'Attendance Time']
+    ];
+
+    for (var record in presentUsers) {
+      Map<String, dynamic> extraData = {};
+      if (record['data'] != null && record['data'] is String) {
+        try {
+          extraData = jsonDecode(record['data']);
+        } catch (_) {}
+      }
+
+      final name = extraData['sewadar_name'] ?? 'Unknown';
+      final badge = extraData['badge_no'] ?? '-';
+      final mobile = extraData['mobile_self'] ?? '-';
+
+      final timestamp = DateTime.tryParse(record['datetime'] ?? '');
+      final time = timestamp != null
+          ? DateFormat('yyyy-MM-dd HH:mm').format(timestamp.toLocal())
+          : '';
+
+      csvData.add([name, badge, mobile, time]);
+    }
+
+    final directory = await getTemporaryDirectory();
+    final path =
+        '${directory.path}/attendance_report_${DateTime.now().millisecondsSinceEpoch}.csv';
+    final file = File(path);
+    String csv = const ListToCsvConverter().convert(csvData);
+    await file.writeAsString(csv);
+
+    await Share.shareXFiles([XFile(file.path)],
+        text: 'Here is the exported attendance report CSV');
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Coming Soon'),
-        automaticallyImplyLeading: false,
+        title: const Text("Attendance Report"),
+        actions: [
+          IconButton(
+              icon: const Icon(Icons.refresh), onPressed: fetchDashboard),
+        ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(
-              Icons.construction,
-              size: 80,
-              color: Colors.orange,
+      body: Column(
+        children: [
+          const SizedBox(height: 10),
+
+          // 🔘 Filter + Export
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: _pickDateRange,
+                  icon: const Icon(Icons.date_range),
+                  label: Text(
+                    _selectedRange == null
+                        ? "Select Date Range"
+                        : "${DateFormat('dd MMM').format(_selectedRange!.start)} - ${DateFormat('dd MMM').format(_selectedRange!.end)}",
+                  ),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton.icon(
+                  onPressed: _exportToCSV,
+                  icon: const Icon(Icons.download),
+                  label: const Text("Export CSV"),
+                ),
+              ],
             ),
-            SizedBox(height: 20),
-            Text(
-              'This feature is coming soon!',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Stay tuned for updates.',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-          ],
-        ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // 📋 Attendance List
+          Expanded(
+            child: presentUsers.isEmpty
+                ? const Center(child: Text("⚠️ No attendance records found"))
+                : ListView.builder(
+                    itemCount: presentUsers.length,
+                    itemBuilder: (context, index) {
+                      final record = presentUsers[index];
+                      Map<String, dynamic> extraData = {};
+                      if (record['data'] != null && record['data'] is String) {
+                        try {
+                          extraData = jsonDecode(record['data']);
+                        } catch (_) {}
+                      }
+
+                      final name = extraData['sewadar_name'] ?? 'Unknown';
+                      final badge = extraData['badge_no'] ?? '-';
+                      final mobile = extraData['mobile_self'] ?? '-';
+                      final timestamp =
+                          DateTime.tryParse(record['datetime'] ?? '');
+                      final time = timestamp != null
+                          ? DateFormat('dd MMM, HH:mm')
+                              .format(timestamp.toLocal())
+                          : '';
+
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        child: ListTile(
+                          leading: const Icon(Icons.person),
+                          title: Text(name),
+                          subtitle: Text("Badge: $badge\nMobile: $mobile"),
+                          trailing: Text(time),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }

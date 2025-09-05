@@ -126,14 +126,6 @@ class ApiService {
     }
   }
 
-  // --------------------------
-  // 📊 Dashboard API
-  // --------------------------
-  static Future<dynamic> getDashboard({String? date}) async {
-    final endpoint = date != null ? "/dashboard?date=$date" : "/dashboard";
-    return await _getRequest(endpoint);
-  }
-
   static Future<List<dynamic>> getDepartments() async {
     final url = Uri.parse('$baseUrl/departments/all');
     final response = await http.post(url);
@@ -167,63 +159,49 @@ class ApiService {
     }
   }
 
-  static Future<void> addAttendance({
-    required int sid,
+  static Future<void> markAttendance({
+    required String sid,
     required String attendance,
+    required DateTime time,
   }) async {
-    final body = jsonEncode({
-      "sid": sid,
-      "attendance": attendance,
-    });
-
     final response = await http.post(
       Uri.parse("$baseUrl/attendance"),
       headers: {"Content-Type": "application/json"},
-      body: body,
+      body: jsonEncode({
+        "sid": int.tryParse(sid) ?? sid, // API expects number
+        "attendance": attendance,
+        "timestamp": time.toIso8601String(), // 👈 send ISO format
+      }),
     );
 
-    if (response.statusCode == 200) {
-      print("✅ Attendance saved for sid=$sid");
-    } else {
-      throw Exception("❌ Failed to save attendance: ${response.body}");
+    if (response.statusCode != 200) {
+      throw Exception("Failed to mark attendance: ${response.body}");
     }
   }
 
-  // --------------------------
-  // Generic HTTP Methods
-  // --------------------------
-  static Future<dynamic> _getRequest(String endpoint) async {
-    final response = await http.get(Uri.parse("$baseUrl$endpoint"));
-    if (response.statusCode == 200) return jsonDecode(response.body);
-    throw Exception("GET $endpoint failed: ${response.body}");
-  }
+  static Future<dynamic> post(String endpoint,
+      {Map<String, dynamic>? body}) async {
+    final url = Uri.parse("$baseUrl$endpoint");
 
-  static Future<dynamic> _postRequest(
-      String endpoint, Map<String, dynamic> body) async {
-    final response = await http.post(
-      Uri.parse("$baseUrl$endpoint"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(body),
-    );
-    if (response.statusCode == 200 || response.statusCode == 201)
-      return jsonDecode(response.body);
-    throw Exception("POST $endpoint failed: ${response.body}");
-  }
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: body != null ? jsonEncode(body) : null,
+      );
 
-  static Future<dynamic> _putRequest(
-      String endpoint, Map<String, dynamic> body) async {
-    final response = await http.put(
-      Uri.parse("$baseUrl$endpoint"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(body),
-    );
-    if (response.statusCode == 200) return jsonDecode(response.body);
-    throw Exception("PUT $endpoint failed: ${response.body}");
-  }
+      debugPrint("📡 POST $url");
+      debugPrint("📨 Request Body: $body");
+      debugPrint("📥 Response [${response.statusCode}]: ${response.body}");
 
-  static Future<dynamic> _deleteRequest(String endpoint) async {
-    final response = await http.delete(Uri.parse("$baseUrl$endpoint"));
-    if (response.statusCode == 200) return jsonDecode(response.body);
-    throw Exception("DELETE $endpoint failed: ${response.body}");
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception("Failed to POST $endpoint: ${response.body}");
+      }
+    } catch (e) {
+      debugPrint("❌ POST error $endpoint: $e");
+      rethrow;
+    }
   }
 }

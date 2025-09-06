@@ -444,7 +444,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       }
 
                       final formattedTime = localTime != null
-                          ? DateFormat('hh:mm a, dd MMM').format(localTime)
+                          ? DateFormat('hh:mm a').format(localTime)
                           : "Invalid time";
 
                       final status = record['attendance'] ?? 'Unknown';

@@ -1,3 +1,61 @@
+# name: quick_attendance_app
+# description: A local attendance tracking app using Flutter and Hive.
+# publish_to: "none"
+# version: 1.0.0+1
+
+# environment:
+#   sdk: ">=2.18.0 <4.0.0"
+
+# dependencies:
+#   flutter:
+#     sdk: flutter
+#   hive: ^2.2.3
+#   hive_flutter: ^1.1.0
+#   path_provider: ^2.0.14
+#   intl: ^0.18.1
+#   csv: ^5.0.2
+#   #file_picker: ^5.2.6
+#   share_plus: ^7.2.1
+#   fl_chart: ^0.64.0
+
+# dev_dependencies:
+#   flutter_test:
+#     sdk: flutter
+#   build_runner: ^2.4.6
+#   hive_generator: ^2.0.1
+#   flutter_launcher_icons: ^0.14.1
+#   flutter_native_splash: ^2.4.0
+#   shared_preferences: ^2.1.1
+#   http: ^1.1.0
+
+# flutter:
+#   uses-material-design: true
+#   assets:
+#     - assets/images/logo.png
+
+# flutter_native_splash:
+#   color: "#ffffff"
+#   image: web/icons/logo.png
+#   android: true # ✅ only once
+#   ios: true
+#   web: true
+
+# flutter_launcher_icons:
+#   android: true
+#   ios: true
+#   web:
+#     generate: true
+#     image_path: "web/icons/logo.png"
+#     background_color: "#ffffff"
+#     theme_color: "#1976d2"
+#   windows:
+#     generate: true
+#     image_path: "web/icons/logo.png"
+#     icon_size: 48
+#   macos:
+#     generate: true
+#     image_path: "web/icons/logo.png"
+#   image_path: "web/icons/logo.png"
 name: quick_attendance_app
 description: A local attendance tracking app using Flutter and Hive.
 publish_to: "none"
@@ -14,9 +72,10 @@ dependencies:
   path_provider: ^2.0.14
   intl: ^0.18.1
   csv: ^5.0.2
-  #file_picker: ^5.2.6
   share_plus: ^7.2.1
   fl_chart: ^0.64.0
+  shared_preferences: ^2.1.1 # ✅ moved here
+  http: ^1.1.0 # ✅ moved here
 
 dev_dependencies:
   flutter_test:
@@ -25,18 +84,16 @@ dev_dependencies:
   hive_generator: ^2.0.1
   flutter_launcher_icons: ^0.14.1
   flutter_native_splash: ^2.4.0
-  shared_preferences: ^2.1.1
-  http: ^1.1.0
 
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/logo.png
+    - assets/images/logo.png # ✅ keep consistent
 
 flutter_native_splash:
   color: "#ffffff"
-  image: web/icons/logo.png
-  android: true # ✅ only once
+  image: assets/images/logo.png # ✅ fixed path
+  android: true
   ios: true
   web: true
 
@@ -45,14 +102,14 @@ flutter_launcher_icons:
   ios: true
   web:
     generate: true
-    image_path: "web/icons/logo.png"
+    image_path: "assets/images/logo.png"
     background_color: "#ffffff"
     theme_color: "#1976d2"
   windows:
     generate: true
-    image_path: "web/icons/logo.png"
+    image_path: "assets/images/logo.png"
     icon_size: 48
   macos:
     generate: true
-    image_path: "web/icons/logo.png"
-  image_path: "web/icons/logo.png"
+    image_path: "assets/images/logo.png"
+  image_path: "assets/images/logo.png"

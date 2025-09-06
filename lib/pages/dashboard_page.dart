@@ -392,22 +392,22 @@ class _DashboardPageState extends State<DashboardPage> {
                     flex: 2,
                     child: Text("Name",
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 13))),
+                            fontWeight: FontWeight.bold, fontSize: 15))),
                 Expanded(
                     flex: 1,
                     child: Text("Badge",
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 13))),
+                            fontWeight: FontWeight.bold, fontSize: 15))),
                 Expanded(
                     flex: 2,
                     child: Text("Time",
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 13))),
+                            fontWeight: FontWeight.bold, fontSize: 15))),
                 Expanded(
                     flex: 1,
                     child: Text("Status",
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 13))),
+                            fontWeight: FontWeight.bold, fontSize: 15))),
               ],
             ),
           ),
@@ -457,19 +457,19 @@ class _DashboardPageState extends State<DashboardPage> {
                             Expanded(
                                 flex: 2,
                                 child: Text(name,
-                                    style: const TextStyle(fontSize: 13))),
+                                    style: const TextStyle(fontSize: 15))),
                             Expanded(
                                 flex: 1,
                                 child: Text(badge,
-                                    style: const TextStyle(fontSize: 13))),
+                                    style: const TextStyle(fontSize: 15))),
                             Expanded(
                                 flex: 2,
                                 child: Text(formattedTime,
-                                    style: const TextStyle(fontSize: 13))),
+                                    style: const TextStyle(fontSize: 15))),
                             Expanded(
                                 flex: 1,
                                 child: Text(status,
-                                    style: const TextStyle(fontSize: 13))),
+                                    style: const TextStyle(fontSize: 15))),
                           ],
                         ),
                       );

@@ -94397,7 +94397,7 @@ A.aeP.prototype={
 ZK(a,b){var s,r
 if(b!=null){s=A.aIR(b,this.b)
 if(s!=null)return s
-s=A.aIR(b,B.L4)
+s=A.aIR(b,B.L5)
 if(s!=null)return s}r=A.aUh(a)
 this.a.i(0,r)
 s=B.i0.i(0,r)
@@ -95011,7 +95011,7 @@ return A.K($async$Ac,r)},
 A3(a){var s=null,r=this.c
 if(r==null)return
 r.a3(t.J).f.h6(A.jG(s,s,s,s,s,B.w,s,A.aE(a,s,s,s,s,s,s,s),s,B.b9,s,s,s,s,s,s,s,s,s))},
-G(a){var s,r,q,p,o=this,n=null,m=A.n5(n,n,!0,n,n,n,n,n,n,B.Zg)
+G(a){var s,r,q,p,o=this,n=null,m=A.n5(n,n,!0,n,n,n,n,n,n,B.Zh)
 if(o.x)s=B.nF
 else{s=A.wf(n,B.c5,!1,n,!0,B.w,n,A.Kf(),o.w,n,n,n,n,n,2,B.J4,B.X,!0,n,!0,n,!1,n,B.bU,n,n,n,n,n,n,n,n,1,n,n,!1,"\u2022",n,n,n,n,n,!1,n,n,!1,n,!0,n,B.db,n,n,n,n,n,n,n,n,n,n,n,n,!0,B.U,n,B.dy,n,n,n,n)
 r=o.e.length
@@ -95140,7 +95140,7 @@ case 2:o=b
 if(o!=null){q.R(new A.aqb(q,o))
 q.r6()}return A.J(null,r)}})
 return A.K($async$yJ,r)},
-G(a){var s=this,r=null,q=A.aS2().ji(s.r),p=t.p,o=A.n5(A.b([A.fH(r,r,r,B.pg,r,r,s.gaoI(),r,r,r,r)],p),r,!1,r,r,r,r,r,r,B.B9),n=A.cX(A.b([A.aE("Showing data for: "+q,r,r,r,B.iM,r,r,r),A.aWB(B.kT,B.Zp,s.ga9N())],p),B.E,B.cO,B.F,0,r),m=A.cX(A.b([s.EV("Total",s.d,B.ll),B.iB,s.EV("Present",s.e,B.OO),B.iB,s.EV("Absent",s.f,B.vP)],p),B.E,B.t,B.F,0,r),l=A.im(r,A.cX(B.L5,B.E,B.t,B.F,0,r),B.z,B.o5,r,r,r,r,r,B.oC,r,r,r),k=s.w.length
+G(a){var s=this,r=null,q=A.aS2().ji(s.r),p=t.p,o=A.n5(A.b([A.fH(r,r,r,B.pg,r,r,s.gaoI(),r,r,r,r)],p),r,!1,r,r,r,r,r,r,B.B9),n=A.cX(A.b([A.aE("Showing data for: "+q,r,r,r,B.iM,r,r,r),A.aWB(B.kT,B.Zp,s.ga9N())],p),B.E,B.cO,B.F,0,r),m=A.cX(A.b([s.EV("Total",s.d,B.ll),B.iB,s.EV("Present",s.e,B.OO),B.iB,s.EV("Absent",s.f,B.vP)],p),B.E,B.t,B.F,0,r),l=A.im(r,A.cX(B.L4,B.E,B.t,B.F,0,r),B.z,B.o5,r,r,r,r,r,B.oC,r,r,r),k=s.w.length
 return A.mi(o,r,A.cg(A.b([new A.aZ(B.hu,n,r),new A.aZ(B.dT,m,r),B.fK,l,A.cm(k===0?B.EO:A.aTZ(new A.aqc(s),k,new A.aqd()),1)],p),B.E,B.t,B.F,0,B.L),r,r,r)},
 EV(a,b,c){var s=null,r=A.yU(10)
 return A.cm(A.im(s,A.cg(A.b([A.aE(a,s,s,s,B.VQ,s,s,s),B.TI,A.aE(B.e.k(b),s,s,s,B.Wb,s,s,s)],t.p),B.E,B.t,B.F,0,B.L),B.z,s,s,new A.dq(c,s,s,r,s,s,B.aW),s,s,s,B.hu,s,s,s),1)}}
@@ -95187,7 +95187,7 @@ s=r.aj8(J.aJ(i,"datetime"),!1,!0).LC()}catch(p){q=A.ah(p)
 A.yj("Parse error: "+A.l(q))}m=s!=null?A.nk("hh:mm a, dd MMM",j).ji(s):"Invalid time"
 l=J.aJ(i,"attendance")
 if(l==null)l="Unknown"
-return new A.aZ(B.oC,A.cX(A.b([A.cm(A.aE(o,j,j,j,B.iK,j,j,j),2),A.cm(A.aE(n,j,j,j,B.iK,j,j,j),1),A.cm(A.aE(m,j,j,j,B.iK,j,j,j),2),A.cm(A.aE(l,j,j,j,B.iK,j,j,j),1)],t.p),B.E,B.t,B.F,0,j),j)},
+return new A.aZ(B.oC,A.cX(A.b([A.cm(A.aE(o,j,j,j,B.iL,j,j,j),2),A.cm(A.aE(n,j,j,j,B.iL,j,j,j),1),A.cm(A.aE(m,j,j,j,B.iL,j,j,j),2),A.cm(A.aE(l,j,j,j,B.iL,j,j,j),1)],t.p),B.E,B.t,B.F,0,j),j)},
 $S:591}
 A.pK.prototype={
 a8(){return new A.UU(new A.dg(B.av,$.ad()),A.b([],t.g))}}
@@ -95297,7 +95297,7 @@ p.c.a3(t.J).f.h6(A.jG(null,null,null,null,null,B.w,null,A.aE("Logout failed: "+A
 return A.K($async$zr,r)},
 G(a){var s,r,q=this,p=null,o=A.aE(q.f[q.d],p,p,p,p,p,p,p),n=t.p
 o=A.n5(A.b([A.fH(p,p,p,B.Im,p,p,new A.atc(),p,p,p,p),new A.v9(new A.atd(),new A.ate(q,a),p,t.iX)],n),p,!0,p,p,p,p,p,p,o)
-n=A.aDy(A.b([new A.MX(B.CO,A.cg(A.b([B.Iv,B.iC,A.aE("Welcome",p,p,p,B.X1,p,p,p),A.aE("Admin",p,p,p,B.Vk,p,p,p)],n),B.aG,B.t,B.F,0,B.L),p),A.hg(B.kV,new A.atf(q,a),p,B.B9,p),A.hg(B.Is,new A.atg(q,a),p,B.Z7,p),A.hg(B.kU,new A.ath(q,a),p,B.YZ,p),B.hq,A.hg(B.In,new A.ati(a),p,B.Ba,p),A.hg(B.Ip,new A.atj(q,a),p,B.Zf,p)],n),B.ac,p,!1)
+n=A.aDy(A.b([new A.MX(B.CO,A.cg(A.b([B.Iv,B.iC,A.aE("Welcome",p,p,p,B.X1,p,p,p),A.aE("Admin",p,p,p,B.Vk,p,p,p)],n),B.aG,B.t,B.F,0,B.L),p),A.hg(B.kV,new A.atf(q,a),p,B.B9,p),A.hg(B.Is,new A.atg(q,a),p,B.Z7,p),A.hg(B.kU,new A.ath(q,a),p,B.YZ,p),B.hq,A.hg(B.In,new A.ati(a),p,B.Ba,p),A.hg(B.Ip,new A.atj(q,a),p,B.Zg,p)],n),B.ac,p,!1)
 s=q.d
 r=q.e[s]
 return A.mi(o,p,r,new A.yX(B.Mw,new A.atk(q),s,p,p),new A.MT(n,p),p)}}
@@ -95403,7 +95403,7 @@ case 5:return A.J(null,r)
 case 1:return A.I(p.at(-1),r)}})
 return A.K($async$uI,r)},
 G(a){var s=this,r=null,q=A.aVA(r,r,new A.yO("assets/images/logo.png",r,r)),p=A.wf(r,B.c5,!1,r,!0,B.w,r,A.Kf(),s.d,r,r,r,r,r,2,B.IY,B.X,!0,r,!0,r,!1,r,B.bU,r,r,r,r,r,r,r,r,1,r,r,!1,"\u2022",r,r,r,r,r,!1,r,r,!1,r,!0,r,B.db,r,r,r,r,r,r,r,r,r,r,r,r,!0,B.U,r,B.dy,r,r,r,r),o=A.wf(r,B.c5,!1,r,!0,B.w,r,A.Kf(),s.e,r,r,r,r,r,2,B.Ja,B.X,!0,r,!0,r,!1,r,B.bU,r,r,r,r,r,r,r,r,1,r,r,!0,"\u2022",r,r,r,r,r,!1,r,r,!1,r,!0,r,B.db,r,r,r,r,r,r,r,r,r,r,r,r,!0,B.U,r,B.dy,r,r,r,r),n=s.f?B.nG:A.aCZ(!1,B.Z1,r,r,r,r,r,r,s.gahs(),r,A.aD0(r,r,r,r,r,r,r,r,r,r,r,B.Tw,r,r,r,r,r,r,r,r))
-return A.mi(r,r,A.eK(A.Re(A.cg(A.b([new A.AP(q,100,r),B.fJ,B.Za,B.TH,B.Z_,B.fK,p,B.fJ,o,B.fK,n],t.p),B.E,B.fm,B.F,0,B.L),B.oz,r,B.am),r,r),r,r,r)}}
+return A.mi(r,r,A.eK(A.Re(A.cg(A.b([new A.AP(q,100,r),B.fJ,B.Zb,B.TH,B.Z_,B.fK,p,B.fJ,o,B.fK,n],t.p),B.E,B.fm,B.F,0,B.L),B.oz,r,B.am),r,r),r,r,r)}}
 A.aur.prototype={
 $0(){return this.a.f=!0},
 $S:0}
@@ -95493,7 +95493,7 @@ case 3:s=4
 return A.R(A.aE_(A.b([A.aXl(c.a,null)],t.FQ),"Here is the exported attendance report CSV"),$async$qs)
 case 4:return A.J(null,r)}})
 return A.K($async$qs,r)},
-G(a){var s=this,r=null,q=t.p,p=A.n5(A.b([A.fH(r,r,r,B.pg,r,r,s.garG(),r,r,r,r)],q),r,!0,r,r,r,r,r,r,B.Zh),o=A.cX(A.b([A.aD_(B.Ix,A.aE(s.d==null?"Select Date Range":A.nk("dd MMM",r).ji(s.d.a)+" - "+A.nk("dd MMM",r).ji(s.d.b),r,r,r,r,r,r,r),s.gajG(),r),B.TC,A.aD_(B.IA,B.Z3,s.gabj(),r)],q),B.E,B.t,B.F,0,r),n=s.e.length
+G(a){var s=this,r=null,q=t.p,p=A.n5(A.b([A.fH(r,r,r,B.pg,r,r,s.garG(),r,r,r,r)],q),r,!0,r,r,r,r,r,r,B.Zj),o=A.cX(A.b([A.aD_(B.Ix,A.aE(s.d==null?"Select Date Range":A.nk("dd MMM",r).ji(s.d.a)+" - "+A.nk("dd MMM",r).ji(s.d.b),r,r,r,r,r,r,r),s.gajG(),r),B.TC,A.aD_(B.IA,B.Z3,s.gabj(),r)],q),B.E,B.t,B.F,0,r),n=s.e.length
 return A.mi(p,r,A.cg(A.b([B.iC,new A.aZ(B.cK,o,r),B.iC,A.cm(n===0?B.EN:A.abz(new A.awI(s),n),1)],q),B.E,B.t,B.F,0,B.L),r,r,r)}}
 A.awL.prototype={
 $0(){var s,r=this.b.i(0,"present_users"),q=r!=null&&t.j.b(r),p=this.a
@@ -100126,17 +100126,17 @@ B.EJ=new A.tC(null,null,null,null,null,null,null)
 B.EK=new A.z6(null,null,null,null,null)
 B.Z8=new A.cq("No users added yet.",null,null,null,null,null,null,null,null,null)
 B.EL=new A.fA(B.R,null,null,B.Z8,null)
-B.Z9=new A.cq("No sewadar found",null,null,null,null,null,null,null,null,null)
-B.EM=new A.fA(B.R,null,null,B.Z9,null)
-B.Zd=new A.cq("\u26a0\ufe0f No attendance records found",null,null,null,null,null,null,null,null,null)
-B.EN=new A.fA(B.R,null,null,B.Zd,null)
+B.Za=new A.cq("No sewadar found",null,null,null,null,null,null,null,null,null)
+B.EM=new A.fA(B.R,null,null,B.Za,null)
+B.Ze=new A.cq("\u26a0\ufe0f No attendance records found",null,null,null,null,null,null,null,null,null)
+B.EN=new A.fA(B.R,null,null,B.Ze,null)
 B.a23=new A.anv(0,"material")
 B.nG=new A.zb(null)
 B.nF=new A.fA(B.R,null,null,B.nG,null)
 B.Z4=new A.cq("\u26a0\ufe0f No one marked present",null,null,null,null,null,null,null,null,null)
 B.EO=new A.fA(B.R,null,null,B.Z4,null)
-B.Ze=new A.cq("No departments added.",null,null,null,null,null,null,null,null,null)
-B.EP=new A.fA(B.R,null,null,B.Ze,null)
+B.Zf=new A.cq("No departments added.",null,null,null,null,null,null,null,null,null)
+B.EP=new A.fA(B.R,null,null,B.Zf,null)
 B.EQ=new A.z9(null,null,null,null,null,null,null,null,null)
 B.ER=new A.za(null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.jw=new A.dL(0,B.m)
@@ -100825,6 +100825,17 @@ B.KW=s([B.jp,B.jq],A.ax("A<yN>"))
 B.KZ=s(["BC","AD"],t.s)
 B.pz=s(["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],t.s)
 B.L1=s(["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],t.s)
+B.co=new A.iw(6,700)
+B.iK=new A.p(!0,null,null,null,null,null,15,B.co,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
+B.Zk=new A.cq("Name",null,B.iK,null,null,null,null,null,null,null)
+B.HB=new A.kn(2,B.cL,B.Zk,null)
+B.Z2=new A.cq("Badge",null,B.iK,null,null,null,null,null,null,null)
+B.HA=new A.kn(1,B.cL,B.Z2,null)
+B.Zi=new A.cq("Time",null,B.iK,null,null,null,null,null,null,null)
+B.HD=new A.kn(2,B.cL,B.Zi,null)
+B.Z9=new A.cq("Status",null,B.iK,null,null,null,null,null,null,null)
+B.HC=new A.kn(1,B.cL,B.Z9,null)
+B.L4=s([B.HB,B.HA,B.HD,B.HC],t.p)
 B.K_=s([37,80,68,70],t.t)
 B.NZ=new A.cJ("application/pdf",B.K_,null)
 B.K0=s([37,81],t.t)
@@ -100886,18 +100897,7 @@ B.Kh=s([0,0,0,0,102,116,121,112,104,101,105,120],t.t)
 B.Om=new A.cJ("image/heic",B.Kh,B.cM)
 B.L0=s([0,0,0,0,102,116,121,112,109,105,102,49],t.t)
 B.O6=new A.cJ("image/heif",B.L0,B.cM)
-B.L4=s([B.NZ,B.Ob,B.O5,B.Op,B.Og,B.Oj,B.Oh,B.Ok,B.Oc,B.O8,B.Oi,B.O1,B.Oa,B.O4,B.Ol,B.O0,B.Oe,B.Oo,B.O2,B.O3,B.Of,B.O7,B.Oq,B.O_,B.O9,B.Od,B.On,B.Om,B.O6],t.gg)
-B.co=new A.iw(6,700)
-B.iL=new A.p(!0,null,null,null,null,null,13,B.co,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Zl=new A.cq("Name",null,B.iL,null,null,null,null,null,null,null)
-B.HB=new A.kn(2,B.cL,B.Zl,null)
-B.Z2=new A.cq("Badge",null,B.iL,null,null,null,null,null,null,null)
-B.HD=new A.kn(1,B.cL,B.Z2,null)
-B.Zm=new A.cq("Time",null,B.iL,null,null,null,null,null,null,null)
-B.HA=new A.kn(2,B.cL,B.Zm,null)
-B.Zi=new A.cq("Status",null,B.iL,null,null,null,null,null,null,null)
-B.HC=new A.kn(1,B.cL,B.Zi,null)
-B.L5=s([B.HB,B.HD,B.HA,B.HC],t.p)
+B.L5=s([B.NZ,B.Ob,B.O5,B.Op,B.Og,B.Oj,B.Oh,B.Ok,B.Oc,B.O8,B.Oi,B.O1,B.Oa,B.O4,B.Ol,B.O0,B.Oe,B.Oo,B.O2,B.O3,B.Of,B.O7,B.Oq,B.O_,B.O9,B.Od,B.On,B.Om,B.O6],t.gg)
 B.Bd=new A.bg(0,0)
 B.Bh=new A.bg(1,0)
 B.Bi=new A.bg(2,0)
@@ -102459,14 +102459,14 @@ B.TR=new A.kT(3,"hide")
 B.a21=new A.kT(4,"remove")
 B.AK=new A.kT(5,"timeout")
 B.TS=new A.w_(null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Zk=new A.cq("Logged out",null,null,null,null,null,null,null,null,null)
-B.TT=new A.kS(B.Zk,null,null,null,null,null,null,null,null,null,null,null,null,B.b9,null,null,null,B.w,null)
-B.Zb=new A.cq("\u2705 Sewadar added successfully!",null,null,null,null,null,null,null,null,null)
-B.TU=new A.kS(B.Zb,null,null,null,null,null,null,null,null,null,null,null,null,B.b9,null,null,null,B.w,null)
-B.Zc=new A.cq("\u2705 Sewadar updated successfully!",null,null,null,null,null,null,null,null,null)
-B.TV=new A.kS(B.Zc,null,null,null,null,null,null,null,null,null,null,null,null,B.b9,null,null,null,B.w,null)
-B.Zj=new A.cq("Department already exists",null,null,null,null,null,null,null,null,null)
-B.TW=new A.kS(B.Zj,null,null,null,null,null,null,null,null,null,null,null,null,B.b9,null,null,null,B.w,null)
+B.Zm=new A.cq("Logged out",null,null,null,null,null,null,null,null,null)
+B.TT=new A.kS(B.Zm,null,null,null,null,null,null,null,null,null,null,null,null,B.b9,null,null,null,B.w,null)
+B.Zc=new A.cq("\u2705 Sewadar added successfully!",null,null,null,null,null,null,null,null,null)
+B.TU=new A.kS(B.Zc,null,null,null,null,null,null,null,null,null,null,null,null,B.b9,null,null,null,B.w,null)
+B.Zd=new A.cq("\u2705 Sewadar updated successfully!",null,null,null,null,null,null,null,null,null)
+B.TV=new A.kS(B.Zd,null,null,null,null,null,null,null,null,null,null,null,null,B.b9,null,null,null,B.w,null)
+B.Zl=new A.cq("Department already exists",null,null,null,null,null,null,null,null,null)
+B.TW=new A.kS(B.Zl,null,null,null,null,null,null,null,null,null,null,null,null,B.b9,null,null,null,B.w,null)
 B.AL=new A.DH(0,"permissive")
 B.TX=new A.DH(1,"normal")
 B.TY=new A.DH(2,"forced")
@@ -102554,7 +102554,6 @@ B.UF=new A.Eg(3,"visible")
 B.fN=new A.at(0,B.j)
 B.UG=new A.Ek(null,null,null)
 B.UH=new A.El(B.i,null)
-B.iK=new A.p(!0,null,null,null,null,null,13,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.FL=new A.D(0.8156862745098039,1,0,0,B.f)
 B.B_=new A.E9(1)
 B.Fv=new A.D(1,1,1,0,B.f)
@@ -102564,6 +102563,7 @@ B.h=new A.E9(0)
 B.Vg=new A.p(!1,B.hn,null,"CupertinoSystemText",null,null,17,null,null,-0.41,null,null,null,null,null,null,null,B.h,null,null,null,null,null,null,null,null)
 B.Vk=new A.p(!0,B.a_,null,null,null,null,14,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.B7=new A.p(!0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,B.B_,null,null,null,null,null,null,null,null)
+B.iL=new A.p(!0,null,null,null,null,null,15,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.VQ=new A.p(!0,B.k,null,null,null,null,14,B.kQ,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.VX=new A.p(!0,B.k,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.Wa=new A.p(!0,null,null,null,null,null,16,B.co,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
@@ -102841,10 +102841,10 @@ B.Z5=new A.cq("Sewadar Information",null,null,null,null,null,null,null,null,null
 B.Z6=new A.cq("Departments",null,null,null,null,null,null,null,null,null)
 B.Z7=new A.cq("Attendance",null,null,null,null,null,null,null,null,null)
 B.X6=new A.p(!0,null,null,null,null,null,28,B.co,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Za=new A.cq("Attendance App",null,B.X6,null,null,null,null,null,null,null)
-B.Zf=new A.cq("Logout",null,null,null,null,null,null,null,null,null)
-B.Zg=new A.cq("Mark Attendance",null,null,null,null,null,null,null,null,null)
-B.Zh=new A.cq("Attendance Report",null,null,null,null,null,null,null,null,null)
+B.Zb=new A.cq("Attendance App",null,B.X6,null,null,null,null,null,null,null)
+B.Zg=new A.cq("Logout",null,null,null,null,null,null,null,null,null)
+B.Zh=new A.cq("Mark Attendance",null,null,null,null,null,null,null,null,null)
+B.Zj=new A.cq("Attendance Report",null,null,null,null,null,null,null,null,null)
 B.B9=new A.cq("Dashboard",null,null,null,null,null,null,null,null,null)
 B.Ba=new A.cq("Settings",null,null,null,null,null,null,null,null,null)
 B.Zn=new A.cq("Submit Attendance",null,null,null,null,null,null,null,null,null)

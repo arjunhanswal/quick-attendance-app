@@ -95184,7 +95184,7 @@ if(n==null)n="-"
 s=null
 try{r=A.nk("yyyy-MM-dd HH:mm:ss",j)
 s=r.aj8(J.aJ(i,"datetime"),!1,!0).LC()}catch(p){q=A.ah(p)
-A.yj("Parse error: "+A.l(q))}m=s!=null?A.nk("hh:mm a, dd MMM",j).ji(s):"Invalid time"
+A.yj("Parse error: "+A.l(q))}m=s!=null?A.nk("hh:mm a",j).ji(s):"Invalid time"
 l=J.aJ(i,"attendance")
 if(l==null)l="Unknown"
 return new A.aZ(B.oC,A.cX(A.b([A.cm(A.aE(o,j,j,j,B.iL,j,j,j),2),A.cm(A.aE(n,j,j,j,B.iL,j,j,j),1),A.cm(A.aE(m,j,j,j,B.iL,j,j,j),2),A.cm(A.aE(l,j,j,j,B.iL,j,j,j),1)],t.p),B.E,B.t,B.F,0,j),j)},

@@ -1,6 +1,6 @@
 {
-    "name": "quick_attendance_fresh",
-    "short_name": "quick_attendance_fresh",
+    "name": "Quick Attendance",
+    "short_name": "Quick Attendance",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#ffffff",

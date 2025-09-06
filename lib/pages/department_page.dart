@@ -56,11 +56,11 @@ class _DepartmentPageState extends State<DepartmentPage> {
       fetchDepartments();
     } catch (e) {
       debugPrint('❌ Failed to add department: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add department: $e')),
-        );
-      }
+      // if (mounted) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(content: Text('Failed to add department: $e')),
+      //   );
+      // }
     }
   }
 

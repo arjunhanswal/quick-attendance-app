@@ -84,14 +84,17 @@ class _AttendancePageState extends State<AttendancePage> {
     if (id == null || id.isEmpty) return;
 
     final now = DateTime.now();
-    final timestamp = DateTime(
+    final localTimestamp = DateTime(
       now.year,
       now.month,
       now.day,
       _selectedTime!.hour,
       _selectedTime!.minute,
     );
-
+    print(localTimestamp);
+// Convert to UTC before sending
+    final timestamp = localTimestamp.toUtc();
+    print(timestamp);
     try {
       await ApiService.markAttendance(
         sid: id,

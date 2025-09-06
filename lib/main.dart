@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quick_attendance_app/pages/satsang_schedule_page.dart';
 import 'pages/homepage.dart';
 import 'pages/loginpage.dart';
 import 'pages/attendance_page.dart';

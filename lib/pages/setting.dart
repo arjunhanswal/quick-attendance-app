@@ -31,7 +31,7 @@ class SettingsPage extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.info),
             title: Text('App Info'),
-            subtitle: Text('Version 1.0.0'),
+            subtitle: Text('Version 1.0.7'),
           ),
           Divider(),
           ListTile(

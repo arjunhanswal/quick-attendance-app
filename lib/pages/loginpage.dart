@@ -22,21 +22,19 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (data["success"] == true) {
-        // ✅ Successful login
         final user = data["user"];
-        print("Logged in user: $user");
 
+        // ✅ Save user session
+        await SessionManager.saveUser(user);
+
+        // ✅ Show welcome message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Welcome ${user["username"]}!")),
         );
-        if (data["success"] == true) {
-          final user = data["user"];
-          await SessionManager.saveUser(user);
-          await SessionManager.saveUser(user['user']);
-          Navigator.pushReplacementNamed(context, '/');
-        }
+
+        // ✅ Navigate to Dashboard
+        Navigator.pushReplacementNamed(context, '/');
       } else {
-        // ❌ Invalid login
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(data["message"] ?? "Invalid credentials")),
         );
@@ -61,11 +59,15 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Image.asset("assets/images/logo.png", height: 100),
               const SizedBox(height: 16),
-              const Text("Attendance App",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+              const Text(
+                "Attendance App",
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 40),
-              const Text("Login",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+              const Text(
+                "Login",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+              ),
               const SizedBox(height: 20),
               TextField(
                 controller: _usernameController,

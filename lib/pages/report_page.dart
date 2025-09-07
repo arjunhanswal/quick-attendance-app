@@ -32,7 +32,7 @@ class _ReportPageState extends State<ReportPage> {
       final fromStr = DateFormat("yyyy-MM-dd").format(from);
       final toStr = DateFormat("yyyy-MM-dd").format(to);
 
-      final response = await ApiService.post(
+      final response = await ApiService.getdashboardDetails(
         "/dashboard?from=$fromStr&to=$toStr",
         body: {},
       );

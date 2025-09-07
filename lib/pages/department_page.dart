@@ -112,8 +112,33 @@ class _DepartmentPageState extends State<DepartmentPage> {
                           title: Text(dept['name'] ?? ''),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () =>
-                                _deleteDepartment(dept['id'] as int),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text("Confirm Delete"),
+                                  content:
+                                      Text("Are you sure you want to delete?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context), // Cancel
+                                      child: const Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context); // Close dialog
+                                        _deleteDepartment(dept['id'] as int);
+                                      },
+                                      child: const Text(
+                                        "Delete",
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
                         );
                       },

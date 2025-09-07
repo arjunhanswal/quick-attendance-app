@@ -168,7 +168,7 @@ class ApiService {
     }
   }
 
-  static Future<dynamic> post(String endpoint,
+  static Future<dynamic> getdashboardDetails(String endpoint,
       {Map<String, dynamic>? body}) async {
     final url = Uri.parse("$baseUrl$endpoint");
 

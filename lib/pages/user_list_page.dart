@@ -137,7 +137,32 @@ class _UserListPageState extends State<UserListPage> {
                       Text('Badge: $badge, Dept: $dept0, Mobile: $mobile'),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => deleteUser(user['sid'].toString(), name),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Confirm Delete"),
+                          content:
+                              Text("Are you sure you want to delete $name?"),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context), // Cancel
+                              child: const Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context); // Close dialog
+                                deleteUser(user['sid'].toString(), name);
+                              },
+                              child: const Text(
+                                "Delete",
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                   onTap: () {
                     Navigator.push(

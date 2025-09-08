@@ -11,6 +11,21 @@ class UserListPage extends StatefulWidget {
 }
 
 class _UserListPageState extends State<UserListPage> {
+  late Future<List<Map<String, dynamic>>> _usersFuture;
+  List<Map<String, dynamic>> _departments = [];
+  @override
+  void initState() {
+    super.initState();
+    _loadDepartments();
+    _usersFuture = fetchUsers();
+  }
+
+  Future<void> _refreshUsers() async {
+    setState(() {
+      _usersFuture = fetchUsers(); // reassign future
+    });
+  }
+
   Future<List<Map<String, dynamic>>> fetchUsers() async {
     try {
       final response = await ApiService.getSewadars();
@@ -74,12 +89,32 @@ class _UserListPageState extends State<UserListPage> {
     return {};
   }
 
+  Future<void> _loadDepartments() async {
+    try {
+      final response = await ApiService.getDepartments();
+      setState(() {
+        _departments = response.cast<Map<String, dynamic>>();
+      });
+    } catch (e) {
+      debugPrint("❌ Failed to load departments: $e");
+    }
+  }
+
+  String getDeptName(dynamic id) {
+    if (id == null) return '';
+    final dept = _departments.firstWhere(
+      (d) => d['id'].toString() == id.toString(),
+      orElse: () => {},
+    );
+    return dept.isNotEmpty ? dept['name'] : '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Sewadar List')),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: fetchUsers(),
+        future: _usersFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -93,96 +128,85 @@ class _UserListPageState extends State<UserListPage> {
             return const Center(child: Text('No users added yet.'));
           }
 
-          return ListView.builder(
-            itemCount: users.length,
-            itemBuilder: (context, index) {
-              final user = users[index];
-              final name = user['sewadar_name'] ?? '';
-              final badge = user['badge_no'] ?? '';
-              final dept0 = user['dept_id0']?.toString() ?? '';
-              final mobile = user['mobile_self'] ?? '';
+          return RefreshIndicator(
+            onRefresh: _refreshUsers,
+            child: ListView.builder(
+              itemCount: users.length,
+              itemBuilder: (context, index) {
+                final user = users[index];
+                final name = user['sewadar_name'] ?? '';
+                final badge = user['badge_no'] ?? '';
+                final dept0 = getDeptName(user['dept_id0']);
+                final mobile = user['mobile_self'] ?? '';
 
-              // return Card(
-              //   margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-              //   child: ListTile(
-              //     leading: CircleAvatar(
-              //       backgroundColor: Colors.deepPurple,
-              //       child: Text(
-              //         name.isNotEmpty ? name[0].toUpperCase() : '?',
-              //         style: const TextStyle(color: Colors.white),
-              //       ),
-              //     ),
-              //     title: Text(name),
-              //     subtitle: Text(
-              //       'Badge: $badge, Dept: $dept0, Mobile: $mobile',
-              //     ),
-              //     trailing: IconButton(
-              //       icon: const Icon(Icons.delete, color: Colors.red),
-              //       onPressed: () => deleteUser(user['sid'].toString(), name),
-              //     ),
-              //   ),
-              // );
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.deepPurple,
-                    child: Text(
-                      name.isNotEmpty ? name[0].toUpperCase() : '?',
-                      style: const TextStyle(color: Colors.white),
+                return Card(
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.deepPurple,
+                      child: Text(
+                        name.isNotEmpty ? name[0].toUpperCase() : '?',
+                        style: const TextStyle(color: Colors.white),
+                      ),
                     ),
-                  ),
-                  title: Text(name),
-                  subtitle:
-                      Text('Badge: $badge, Dept: $dept0, Mobile: $mobile'),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text("Confirm Delete"),
-                          content:
-                              Text("Are you sure you want to delete $name?"),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context), // Cancel
-                              child: const Text("Cancel"),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context); // Close dialog
-                                deleteUser(user['sid'].toString(), name);
-                              },
-                              child: const Text(
-                                "Delete",
-                                style: TextStyle(color: Colors.red),
+                    title: Text(name),
+                    subtitle:
+                        Text('Badge: $badge, Dept: $dept0, Mobile: $mobile'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("Confirm Delete"),
+                            content:
+                                Text("Are you sure you want to delete $name?"),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(context), // Cancel
+                                child: const Text("Cancel"),
                               ),
-                            ),
-                          ],
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  deleteUser(user['sid'].toString(), name);
+                                  _refreshUsers(); // ✅ reload after delete
+                                },
+                                child: const Text(
+                                  "Delete",
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              AddUserPageNew(isEdit: true, userData: user),
                         ),
-                      );
+                      ).then((result) {
+                        if (result == true)
+                          _refreshUsers(); // ✅ reload after update
+                      });
                     },
                   ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            AddUserPageNew(isEdit: true, userData: user),
-                      ),
-                    ).then((_) => setState(() {})); // refresh after update
-                  },
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/add-user-new').then((_) {
-            setState(() {}); // refresh after adding
+          Navigator.pushNamed(context, '/add-user-new').then((result) {
+            if (result == true) _refreshUsers(); // ✅ reload after adding
           });
         },
         backgroundColor: Colors.deepPurple,

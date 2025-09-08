@@ -94,13 +94,44 @@ class _SewadarFormState extends State<AddUserPageNew> {
   Future<void> _pickDate(TextEditingController controller) async {
     final picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().subtract(const Duration(days: 365 * 20)),
+      initialDate: DateTime.now(),
       firstDate: DateTime(1940),
       lastDate: DateTime.now(),
+      helpText: "Select Year",
+      fieldLabelText: "Enter Year",
+      fieldHintText: "e.g. 2025",
     );
+
     if (picked != null) {
       setState(() {
-        controller.text = "${picked.day}/${picked.month}/${picked.year}";
+        controller.text = picked.year.toString(); // ✅ only year
+      });
+    }
+  }
+
+  Future<void> _pickYearDialog(TextEditingController controller) async {
+    final currentYear = DateTime.now().year;
+    final years =
+        List.generate(100, (index) => currentYear - index); // last 100 years
+
+    String? selectedYear = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: const Text("Select Year"),
+          children: years
+              .map((year) => SimpleDialogOption(
+                    onPressed: () => Navigator.pop(context, year.toString()),
+                    child: Text(year.toString()),
+                  ))
+              .toList(),
+        );
+      },
+    );
+
+    if (selectedYear != null) {
+      setState(() {
+        controller.text = selectedYear;
       });
     }
   }
@@ -147,9 +178,10 @@ class _SewadarFormState extends State<AddUserPageNew> {
         Navigator.pop(context, true);
       } catch (e) {
         debugPrint("❌ Error saving Sewadar: $e");
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text("Error: $e")),
-        // );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: $e")),
+        );
+        Navigator.pop(context, true);
       }
     }
   }
@@ -262,7 +294,7 @@ class _SewadarFormState extends State<AddUserPageNew> {
                   TextFormField(
                     controller: _naamdaanDateController,
                     readOnly: true,
-                    onTap: () => _pickDate(_naamdaanDateController),
+                    onTap: () => _pickYearDialog(_naamdaanDateController),
                     decoration:
                         const InputDecoration(labelText: "Naamdaan Date/Year"),
                   ),

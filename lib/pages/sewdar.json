@@ -1,0 +1,57 @@
+[
+    {
+      "badge_no": "L03957",
+      "dept_id0": "Pandal",
+      "dept_id1": "Pandal",
+      "sewadar_name": "Pushpa Verma",
+      "father_or_husband_name": "Madan Verma",
+      "dob_or_age": "24593",
+      "aadhaar_no": "",
+      "namdan_status": "Yes",
+      "namdan_date": "40940",
+      "address": "23/4 Purana Gayatri Nagar Sukhliya Indore",
+      "education": "10th",
+      "occupation": "Housewife",
+      "mobile_self": "6266966944",
+      "mobile_family": "8619006091",
+      "nearest_sewadar_name": "Kamla Deshmukh",
+      "other_info": ""
+    },
+    {
+      "badge_no": "L03958",
+      "dept_id0": "Langar",
+      "dept_id1": "Langar",
+      "sewadar_name": "Rajesh Sharma",
+      "father_or_husband_name": "Ramesh Sharma",
+      "dob_or_age": "24595",
+      "aadhaar_no": "123456789012",
+      "namdan_status": "No",
+      "namdan_date": "",
+      "address": "12 Main Road Indore",
+      "education": "BA",
+      "occupation": "Teacher",
+      "mobile_self": "9876543210",
+      "mobile_family": "9826001234",
+      "nearest_sewadar_name": "Suresh Patil",
+      "other_info": "Active member"
+    },
+    {
+      "badge_no": "L03959",
+      "dept_id0": "Security",
+      "dept_id1": "Security",
+      "sewadar_name": "Sunita Patel",
+      "father_or_husband_name": "Hari Om Patel",
+      "dob_or_age": "24598",
+      "aadhaar_no": "234567890123",
+      "namdan_status": "Yes",
+      "namdan_date": "41000",
+      "address": "45 Nehru Nagar Khandwa Road",
+      "education": "MA",
+      "occupation": "Nurse",
+      "mobile_self": "9988776655",
+      "mobile_family": "8877665544",
+      "nearest_sewadar_name": "Geeta Sharma",
+      "other_info": ""
+    }
+  ]
+  

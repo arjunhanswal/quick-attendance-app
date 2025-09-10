@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 
 class ApiService {
-  static const String baseUrl = "https://arhans.codebhai.online/api";
+  static const String baseUrl = "https://attapiprod.codezhub.tech/api";
 
   /// 📋 Get all active sewadar
   static Future<List<Map<String, dynamic>>> getSewadars() async {
@@ -88,8 +88,9 @@ class ApiService {
       body: body,
     );
 
-    if (response.statusCode != 200) {
-      throw Exception("Failed to add sewadar: ${response.body}");
+    if (response.statusCode != 201) {
+      print(response.statusCode);
+      throw Exception("add sewadar: ${response.body}");
     }
   }
 
@@ -101,8 +102,8 @@ class ApiService {
       body: jsonEncode({"data": data}),
     );
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to update Sewadar: ${response.body}');
+    if (response.statusCode != 201) {
+      throw Exception('update Sewadar: ${response.body}');
     }
   }
 

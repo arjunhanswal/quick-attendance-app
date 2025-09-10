@@ -177,9 +177,9 @@ class _SewadarFormState extends State<AddUserPageNew> {
 
         Navigator.pop(context, true);
       } catch (e) {
-        debugPrint("❌ Error saving Sewadar: $e");
+        debugPrint("Saving Sewadar: $e");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e")),
+          SnackBar(content: Text("Saving Sewadar: $e")),
         );
         Navigator.pop(context, true);
       }

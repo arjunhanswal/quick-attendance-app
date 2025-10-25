@@ -6,6 +6,17 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:csv/csv.dart';
 import 'api_service.dart';
+import 'dart:convert';
+import 'dart:io' show File;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:csv/csv.dart';
+// Only import dart:html for web builds
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
 class ReportPage extends StatefulWidget {
   const ReportPage({super.key});
@@ -99,16 +110,66 @@ class _ReportPageState extends State<ReportPage> {
       csvData.add([name, badge, mobile, time]);
     }
 
-    final directory = await getTemporaryDirectory();
-    final path =
-        '${directory.path}/attendance_report_${DateTime.now().millisecondsSinceEpoch}.csv';
-    final file = File(path);
-    String csv = const ListToCsvConverter().convert(csvData);
-    await file.writeAsString(csv);
+    final csv = const ListToCsvConverter().convert(csvData);
+    final fileName =
+        'attendance_report_${DateTime.now().millisecondsSinceEpoch}.csv';
 
-    await Share.shareXFiles([XFile(file.path)],
-        text: 'Here is the exported attendance report CSV');
+    if (kIsWeb) {
+      // ✅ Web: trigger browser download
+      final bytes = utf8.encode(csv);
+      final blob = html.Blob([bytes], 'text/csv');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute('download', fileName)
+        ..click();
+      html.Url.revokeObjectUrl(url);
+    } else {
+      // ✅ Mobile/Desktop: Save to temp & share
+      final directory = await getTemporaryDirectory();
+      final path = '${directory.path}/$fileName';
+      final file = File(path);
+      await file.writeAsString(csv);
+
+      await Share.shareXFiles([XFile(file.path)],
+          text: 'Here is the exported attendance report CSV');
+    }
   }
+
+  // Future<void> _exportToCSV() async {
+  //   List<List<String>> csvData = [
+  //     ['Sewadar Name', 'Badge No', 'Mobile', 'Attendance Time']
+  //   ];
+
+  //   for (var record in presentUsers) {
+  //     Map<String, dynamic> extraData = {};
+  //     if (record['data'] != null && record['data'] is String) {
+  //       try {
+  //         extraData = jsonDecode(record['data']);
+  //       } catch (_) {}
+  //     }
+
+  //     final name = extraData['sewadar_name'] ?? 'Unknown';
+  //     final badge = extraData['badge_no'] ?? '-';
+  //     final mobile = extraData['mobile_self'] ?? '-';
+
+  //     final timestamp = DateTime.tryParse(record['datetime'] ?? '');
+  //     final time = timestamp != null
+  //         ? DateFormat('yyyy-MM-dd HH:mm').format(timestamp.toLocal())
+  //         : '';
+
+  //     csvData.add([name, badge, mobile, time]);
+  //   }
+
+  //   final directory = await getTemporaryDirectory();
+  //   final path =
+  //       '${directory.path}/attendance_report_${DateTime.now().millisecondsSinceEpoch}.csv';
+  //   final file = File(path);
+  //   String csv = const ListToCsvConverter().convert(csvData);
+  //   await file.writeAsString(csv);
+
+  //   await Share.shareXFiles([XFile(file.path)],
+  //       text: 'Here is the exported attendance report CSV');
+  // }
 
   @override
   Widget build(BuildContext context) {

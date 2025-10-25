@@ -22,8 +22,17 @@ class _DepartmentPageState extends State<DepartmentPage> {
   Future<void> fetchDepartments() async {
     try {
       final response = await ApiService.getDepartments();
+      final departmentsList = response.cast<Map<String, dynamic>>();
+
+      // 🔹 Sort by 'name' key (case-insensitive)
+      departmentsList.sort((a, b) {
+        final nameA = (a['name'] ?? '').toString().toLowerCase();
+        final nameB = (b['name'] ?? '').toString().toLowerCase();
+        return nameA.compareTo(nameB);
+      });
+
       setState(() {
-        _departments = response.cast<Map<String, dynamic>>();
+        _departments = departmentsList;
       });
     } catch (e) {
       debugPrint('❌ Failed to load departments: $e');

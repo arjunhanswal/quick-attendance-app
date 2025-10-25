@@ -30,18 +30,36 @@ class _UserListPageState extends State<UserListPage> {
     try {
       final response = await ApiService.getSewadars();
 
-      return response.map<Map<String, dynamic>>((item) {
-        // since getSewadars already decodes `data`, just merge directly
+      // return response.map<Map<String, dynamic>>((item) {
+      //   // since getSewadars already decodes `data`, just merge directly
+      //   final userMap = {
+      //     "sid": item['sid']?.toString() ?? "",
+      //     "created_at": item['created_at']?.toString() ?? "",
+      //     "status": item['status']?.toString() ?? "",
+      //     ...item, // item already contains parsed fields like sewadar_name, badge_no etc
+      //   };
+
+      //   print("✅ Parsed user: $userMap"); // use print instead of debugPrint
+      //   return userMap;
+      // }).toList();
+      final users = response.map<Map<String, dynamic>>((item) {
         final userMap = {
           "sid": item['sid']?.toString() ?? "",
           "created_at": item['created_at']?.toString() ?? "",
           "status": item['status']?.toString() ?? "",
-          ...item, // item already contains parsed fields like sewadar_name, badge_no etc
+          ...item,
         };
-
-        print("✅ Parsed user: $userMap"); // use print instead of debugPrint
         return userMap;
       }).toList();
+
+      // ✅ Sort alphabetically by name
+      users.sort((a, b) {
+        final nameA = (a['sewadar_name'] ?? '').toString().toLowerCase();
+        final nameB = (b['sewadar_name'] ?? '').toString().toLowerCase();
+        return nameA.compareTo(nameB);
+      });
+
+      return users;
     } catch (e) {
       print("❌ Failed to fetch users: $e");
       return [];

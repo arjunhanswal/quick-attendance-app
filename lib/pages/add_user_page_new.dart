@@ -91,20 +91,39 @@ class _SewadarFormState extends State<AddUserPageNew> {
     }
   }
 
+  // Future<void> _pickDate(TextEditingController controller) async {
+  //   final picked = await showDatePicker(
+  //     context: context,
+  //     initialDate: DateTime.now(),
+  //     firstDate: DateTime(1940),
+  //     lastDate: DateTime.now(),
+  //     helpText: "Select Year",
+  //     fieldLabelText: "Enter Year",
+  //     fieldHintText: "e.g. 2025",
+  //   );
+
+  //   if (picked != null) {
+  //     setState(() {
+  //       controller.text = picked.year.toString(); // ✅ only year
+  //     });
+  //   }
+  // }
   Future<void> _pickDate(TextEditingController controller) async {
     final picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(1940),
       lastDate: DateTime.now(),
-      helpText: "Select Year",
-      fieldLabelText: "Enter Year",
-      fieldHintText: "e.g. 2025",
+      helpText: "Select Date",
+      fieldLabelText: "Enter Date",
+      fieldHintText: "e.g. 25/10/2025",
     );
 
     if (picked != null) {
       setState(() {
-        controller.text = picked.year.toString(); // ✅ only year
+        // ✅ Format full date as dd-MM-yyyy
+        controller.text =
+            "${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}";
       });
     }
   }

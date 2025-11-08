@@ -116,7 +116,7 @@ class _AttendancePageState extends State<AttendancePage> {
 
   void _showMsg(String msg) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override

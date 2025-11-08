@@ -206,7 +206,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           children: [
                             Expanded(
                                 flex: 2,
-                                child: Text(name,
+                                child: Text(capitalizeName(name),
                                     style: const TextStyle(fontSize: 15))),
                             Expanded(
                                 flex: 1,
@@ -257,4 +257,14 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
     );
   }
+}
+
+String capitalizeName(String fullName) {
+  if (fullName.isEmpty) return fullName;
+  return fullName
+      .split(' ')
+      .map((word) => word.isNotEmpty
+          ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+          : '')
+      .join(' ');
 }

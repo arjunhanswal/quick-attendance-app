@@ -30,7 +30,7 @@ class _SewadarFormState extends State<AddUserPageNew> {
   final _nearbySewadarController = TextEditingController();
   final _mobileNearbyController = TextEditingController();
   final _otherInfoController = TextEditingController();
-
+  String _sewadarType = "Sewadar"; // Default
   String? _naamdaanStatus;
   int? _selectedDepartmentSukhliya;
   int? _selectedDepartmentKhandwa;
@@ -58,6 +58,9 @@ class _SewadarFormState extends State<AddUserPageNew> {
       _nearbySewadarController.text = data['nearest_sewadar_name'] ?? '';
       _mobileNearbyController.text = data['nearest_sewadar_mobile'] ?? '';
       _otherInfoController.text = data['other_info'] ?? '';
+      if (widget.isEdit && widget.userData != null) {
+        _sewadarType = widget.userData!['sewadar_type'] ?? "Sewadar";
+      }
       _selectedDepartmentSukhliya =
           data['dept_id0'] != null && data['dept_id0'].toString().isNotEmpty
               ? int.tryParse(data['dept_id0'].toString())
@@ -162,6 +165,7 @@ class _SewadarFormState extends State<AddUserPageNew> {
         final sewadarData = {
           "badge_no": _badgeNumberController.text,
           "sewadar_name": _nameController.text,
+          "sewadar_type": _sewadarType,
           "father_or_husband_name": _fatherHusbandNameController.text,
           "dob_or_age": _dobAgeController.text,
           "aadhaar_no": _aadharController.text,
@@ -294,6 +298,32 @@ class _SewadarFormState extends State<AddUserPageNew> {
                     decoration: const InputDecoration(
                         labelText: "Department (Khandwa)"),
                     validator: (value) => value == null ? "Required" : null,
+                  ),
+                ]),
+                _buildSection("Sewadar Type", [
+                  RadioListTile(
+                    title: const Text("Sewadar"),
+                    value: "Sewadar",
+                    groupValue: _sewadarType,
+                    onChanged: (value) {
+                      setState(() => _sewadarType = value!);
+                    },
+                  ),
+                  RadioListTile(
+                    title: const Text("Bus Sewadar"),
+                    value: "Bus Sewadar",
+                    groupValue: _sewadarType,
+                    onChanged: (value) {
+                      setState(() => _sewadarType = value!);
+                    },
+                  ),
+                  RadioListTile(
+                    title: const Text("Both"),
+                    value: "Both",
+                    groupValue: _sewadarType,
+                    onChanged: (value) {
+                      setState(() => _sewadarType = value!);
+                    },
                   ),
                 ]),
                 _buildSection("Naamdaan", [

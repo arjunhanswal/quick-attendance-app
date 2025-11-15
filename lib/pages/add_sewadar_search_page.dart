@@ -38,6 +38,31 @@ class _AddSewadarSearchPageState extends State<AddSewadarSearchPage> {
   }
 
   /// Fetch Sewadars
+  // Future<void> fetchSewadars() async {
+  //   try {
+  //     final response = await ApiService.getSewadars();
+
+  //     _sewadars = response.map<Map<String, dynamic>>((item) {
+  //       return {
+  //         "sid": item['sid']?.toString() ?? "",
+  //         "sewadar_name": item['sewadar_name'] ?? "Unknown",
+  //         "badge_no": item['badge_no'] ?? "",
+  //       };
+  //     }).toList();
+
+  //     _filtered = List.from(_sewadars);
+  //   } catch (e) {
+  //     debugPrint("❌ Failed to fetch sewadar list: $e");
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Failed to load sewadar list")),
+  //     );
+  //   }
+
+  //   if (mounted) {
+  //     setState(() => _loading = false);
+  //   }
+  // }
+
   Future<void> fetchSewadars() async {
     try {
       final response = await ApiService.getSewadars();
@@ -47,7 +72,14 @@ class _AddSewadarSearchPageState extends State<AddSewadarSearchPage> {
           "sid": item['sid']?.toString() ?? "",
           "sewadar_name": item['sewadar_name'] ?? "Unknown",
           "badge_no": item['badge_no'] ?? "",
+          "sewadar_type": item['sewadar_type'] ?? "Both", // 🔥 added
         };
+      }).toList();
+
+      // 🔥 Filter ONLY Bus Sewadar + Both
+      _sewadars = _sewadars.where((s) {
+        final type = s["sewadar_type"].toString();
+        return type == "Bus Sewadar" || type == "Both";
       }).toList();
 
       _filtered = List.from(_sewadars);

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 
 class ApiService {
   static const String baseUrl = "https://attapiprod.codezhub.tech/api";
@@ -154,20 +155,56 @@ class ApiService {
     required String attendance,
     required DateTime time,
   }) async {
+    final url = Uri.parse("$baseUrl/attendance");
+    final headers = {"Content-Type": "application/json"};
+    final formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(time);
+    final body = {
+      "sid": int.tryParse(sid) ?? sid, // API expects number
+      "attendance": attendance,
+      "datetime": formattedTime, // 👈 send ISO format
+    };
+
+    // 👇 Print request for debugging
+    print("🔹 API Request:");
+    print("URL: $url");
+    print("Headers: $headers");
+    print("Body: ${jsonEncode(body)}");
+
     final response = await http.post(
-      Uri.parse("$baseUrl/attendance"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "sid": int.tryParse(sid) ?? sid, // API expects number
-        "attendance": attendance,
-        "timestamp": time.toIso8601String(), // 👈 send ISO format
-      }),
+      url,
+      headers: headers,
+      body: jsonEncode(body),
     );
+
+    // 👇 Print response details too
+    print("🔹 API Response:");
+    print("Status Code: ${response.statusCode}");
+    print("Body: ${response.body}");
 
     if (response.statusCode != 200) {
       throw Exception("Failed to mark attendance: ${response.body}");
     }
   }
+
+  // static Future<void> markAttendance({
+  //   required String sid,
+  //   required String attendance,
+  //   required DateTime time,
+  // }) async {
+  //   final response = await http.post(
+  //     Uri.parse("$baseUrl/attendance"),
+  //     headers: {"Content-Type": "application/json"},
+  //     body: jsonEncode({
+  //       "sid": int.tryParse(sid) ?? sid, // API expects number
+  //       "attendance": attendance,
+  //       "timestamp": time.toIso8601String(), // 👈 send ISO format
+  //     }),
+  //   );
+
+  //   if (response.statusCode != 200) {
+  //     throw Exception("Failed to mark attendance: ${response.body}");
+  //   }
+  // }
 
   static Future<dynamic> getdashboardDetails(String endpoint,
       {Map<String, dynamic>? body}) async {
@@ -213,5 +250,79 @@ class ApiService {
     } else {
       throw Exception("Failed to login: ${response.statusCode}");
     }
+  }
+
+  /// 🚌 Mark Bus Roll Call Attendance
+  static Future<void> markBusRollCall({
+    required int sid,
+    required DateTime dateTime,
+    required String attendance, // Present / Absent
+  }) async {
+    final url = Uri.parse("$baseUrl/rollcall");
+
+    // Format datetime correctly
+    final formatted = DateFormat("yyyy-MM-dd HH:mm:ss").format(dateTime);
+
+    final body = {
+      "sid": sid,
+      "datetime": formatted,
+      "attendance": attendance,
+    };
+
+    debugPrint("🚌 RollCall API Request → $body");
+
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(body),
+    );
+
+    debugPrint(
+        "🚌 RollCall API Response [${response.statusCode}]: ${response.body}");
+
+    if (response.statusCode != 200) {
+      throw Exception("❌ Failed to submit roll call: ${response.body}");
+    }
+  }
+
+  static Future<Map<String, dynamic>> getBusRollCall({
+    required String from,
+    required String to,
+  }) async {
+    final url = Uri.parse("$baseUrl/rollcall/dashboard?from=$from&to=$to");
+
+    try {
+      debugPrint("📡 POST $url");
+
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+      );
+
+      debugPrint("📥 Response [${response.statusCode}]: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+
+        if (decoded is Map) {
+          // FIX: convert Map<dynamic, dynamic> → Map<String, dynamic>
+          return decoded.cast<String, dynamic>();
+        }
+
+        throw Exception("Invalid API response format");
+      } else {
+        throw Exception("API Error ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint("❌ ERROR calling roll call dashboard: $e");
+      rethrow;
+    }
+  }
+}
+
+class ApiLogger {
+  static void log(String message) {
+    final timestamp = DateTime.now().toIso8601String();
+    debugPrint("📌 [$timestamp] $message");
   }
 }

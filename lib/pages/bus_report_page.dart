@@ -4,7 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:csv/csv.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 import 'api_service.dart';
+
+/// Web required import
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
 class BusReportPage extends StatefulWidget {
   const BusReportPage({super.key});
@@ -42,7 +49,6 @@ class _BusReportPageState extends State<BusReportPage> {
     if (picked != null) setState(() => toDate = picked);
   }
 
-  /// 🔥 Fetch API + decode nested JSON inside "data"
   Future<void> _fetchReport() async {
     if (fromDate == null || toDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -57,33 +63,25 @@ class _BusReportPageState extends State<BusReportPage> {
       String from = dateFormat.format(fromDate!);
       String to = dateFormat.format(toDate!);
 
-      final raw = await ApiService.getBusRollCall(from: from, to: to);
+      final rawResponse = await ApiService.getBusRollCall(from: from, to: to);
 
-      /// API returns: { from, to, total_users, present_users }
-      final List<dynamic> presentUsers = raw["present_users"] ?? [];
+      final List<dynamic> presentUsers = rawResponse["present_users"] ?? [];
 
-      /// Decode inner JSON inside "data"
       final decodedList = presentUsers.map((user) {
-        final innerJsonString = user["data"] ?? "{}";
-
-        Map<String, dynamic> inner;
-        try {
-          inner = jsonDecode(innerJsonString);
-        } catch (e) {
-          inner = {};
-        }
+        final innerDataString = user["data"] ?? "{}";
+        final innerData = jsonDecode(innerDataString);
 
         return {
-          "sid": user["sid"] ?? "",
-          "datetime": user["datetime"] ?? "",
-          "attendance": user["attendance"] ?? "",
-          "details": inner,
+          "sid": user["sid"],
+          "datetime": user["datetime"],
+          "attendance": user["attendance"],
+          "details": innerData,
         };
       }).toList();
 
       setState(() => rollCallData = decodedList);
     } catch (e) {
-      debugPrint("❌ Error loading report: $e");
+      debugPrint("❌ Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Failed to fetch report")),
       );
@@ -92,7 +90,9 @@ class _BusReportPageState extends State<BusReportPage> {
     }
   }
 
-  /// 🔹 Export CSV
+  // -------------------------------------------------------------------
+  // ✅ Universal CSV Export (Web + Mobile + Desktop)
+  // -------------------------------------------------------------------
   Future<void> _exportCSV() async {
     if (rollCallData.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -106,14 +106,10 @@ class _BusReportPageState extends State<BusReportPage> {
 
       List<List<dynamic>> rows = [];
 
-      // Title
       rows.add(["Radha Swami Bus Report - $today"]);
       rows.add([]);
-
-      // Header
       rows.add(["Serial No", "Name", "Mobile", "Present"]);
 
-      // Rows
       for (int i = 0; i < rollCallData.length; i++) {
         final item = rollCallData[i];
         final details = item["details"];
@@ -126,17 +122,38 @@ class _BusReportPageState extends State<BusReportPage> {
         ]);
       }
 
-      String csv = const ListToCsvConverter().convert(rows);
+      final csv = const ListToCsvConverter().convert(rows);
+      final fileName = "Bus_Report_$today.csv";
 
-      final dir = await getDownloadsDirectory();
-      final filePath =
-          "${dir!.path}/Bus_Report_${dateFormat.format(DateTime.now())}.csv";
+      if (kIsWeb) {
+        // ---------------------------------------------
+        // 🌐 Web: Trigger browser download
+        // ---------------------------------------------
+        final bytes = utf8.encode(csv);
+        final blob = html.Blob([bytes], 'text/csv');
+        final url = html.Url.createObjectUrlFromBlob(blob);
 
-      final file = File(filePath);
-      await file.writeAsString(csv);
+        final anchor = html.AnchorElement(href: url)
+          ..setAttribute('download', fileName)
+          ..click();
+
+        html.Url.revokeObjectUrl(url);
+      } else {
+        // ---------------------------------------------
+        // 📱 Mobile/Desktop: Save + Share
+        // ---------------------------------------------
+        final directory = await getTemporaryDirectory();
+        final path = '${directory.path}/$fileName';
+
+        final file = File(path);
+        await file.writeAsString(csv);
+
+        await Share.shareXFiles([XFile(file.path)],
+            text: 'Here is the exported attendance report CSV');
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("CSV saved in Downloads: $filePath")),
+        const SnackBar(content: Text("CSV Exported Successfully")),
       );
     } catch (e) {
       debugPrint("CSV Export Error: $e");
@@ -160,7 +177,6 @@ class _BusReportPageState extends State<BusReportPage> {
       ),
       body: Column(
         children: [
-          /// Date Row
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
@@ -206,8 +222,6 @@ class _BusReportPageState extends State<BusReportPage> {
               ],
             ),
           ),
-
-          /// List
           Expanded(
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -225,8 +239,7 @@ class _BusReportPageState extends State<BusReportPage> {
                             child: ListTile(
                               title: Text(details["sewadar_name"] ?? ""),
                               subtitle: Text(
-                                "Mobile: ${details["mobile_self"] ?? 'N/A'}",
-                              ),
+                                  "Mobile: ${details["mobile_self"] ?? 'N/A'}"),
                               trailing: Text(
                                 item["attendance"] == "Present"
                                     ? "Present"

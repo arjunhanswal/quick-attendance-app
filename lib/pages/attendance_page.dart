@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'api_service.dart';
+import 'dart:convert';
 
 class AttendancePage extends StatefulWidget {
   const AttendancePage({super.key});
@@ -75,6 +76,7 @@ class _AttendancePageState extends State<AttendancePage> {
       _showMsg("Please select a sewadar");
       return;
     }
+
     if (_selectedTime == null) {
       _showMsg("Please select a time");
       return;
@@ -91,10 +93,9 @@ class _AttendancePageState extends State<AttendancePage> {
       _selectedTime!.hour,
       _selectedTime!.minute,
     );
-    print(localTimestamp);
-// Convert to UTC before sending
+
     final timestamp = localTimestamp.toUtc();
-    print(timestamp);
+
     try {
       await ApiService.markAttendance(
         sid: id,
@@ -102,7 +103,10 @@ class _AttendancePageState extends State<AttendancePage> {
         time: timestamp,
       );
 
-      _showMsg("✅ Attendance marked successfully");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Attendance marked successfully")),
+      );
+
       setState(() {
         _selectedSewadar = null;
         _selectedTime = null;
@@ -110,7 +114,21 @@ class _AttendancePageState extends State<AttendancePage> {
         _filteredSewadars = List.from(_sewadars);
       });
     } catch (e) {
-      _showMsg("❌ Failed to mark attendance: $e");
+      String message = "alerdy attandance mark for this date";
+
+      // ✅ If ApiService throws a Map or JSON string
+      try {
+        final decoded = jsonDecode(e.toString());
+        if (decoded is Map && decoded['message'] != null) {
+          message = decoded['message'];
+        }
+      } catch (_) {
+        // ignore JSON decode failure
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
     }
   }
 

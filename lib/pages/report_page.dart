@@ -102,10 +102,27 @@ class _ReportPageState extends State<ReportPage> {
       final badge = extraData['badge_no'] ?? '-';
       final mobile = extraData['mobile_self'] ?? '-';
 
-      final timestamp = DateTime.tryParse(record['datetime'] ?? '');
+      final rawDate = record['datetime'];
+      DateTime? timestamp;
+
+      if (rawDate != null && rawDate.isNotEmpty) {
+        final parsed = DateTime.parse(rawDate);
+
+        // 🚨 Force backend value to be UTC
+        timestamp = DateTime.utc(
+          parsed.year,
+          parsed.month,
+          parsed.day,
+          parsed.hour,
+          parsed.minute,
+          parsed.second,
+        ).toLocal();
+      }
+
       final time = timestamp != null
-          ? DateFormat('yyyy-MM-dd HH:mm').format(timestamp.toLocal())
+          ? DateFormat('yyyy-MM-dd HH:mm').format(timestamp)
           : '';
+      ;
 
       csvData.add([name, badge, mobile, time]);
     }

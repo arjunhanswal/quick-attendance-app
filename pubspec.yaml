@@ -76,6 +76,8 @@ dependencies:
   fl_chart: ^0.64.0
   shared_preferences: ^2.1.1 # ✅ moved here
   http: ^1.1.0 # ✅ moved here
+  pdf: ^3.10.6
+  printing: ^5.10.4
 
 dev_dependencies:
   flutter_test:

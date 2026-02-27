@@ -28333,32 +28333,33 @@ agu:function agu(){},
 agX:function agX(a){this.a=a},
 agW:function agW(){},
 afK:function afK(a){this.a=a},
-aD7(){var s=0,r=A.J(t.H),q,p,o,n,m,l,k,j
+aD7(){var s=0,r=A.J(t.H),q,p,o,n,m,l,k,j,i
 var $async$aD7=A.F(function(a,b){if(a===1)return A.G(b,r)
 while(true)switch(s){case 0:if($.a5==null)A.aMh()
 $.a5.toString
 s=2
 return A.P(A.akU(),$async$aD7)
-case 2:q=A.ai(["/",new A.aDa(),"/login",new A.aDb(),"/attendance",new A.aDc(),"/report",new A.aDd(),"/user-list",new A.aDe(),"/settings",new A.aDf(),"/departments",new A.aDg(),"/add-user-new",new A.aDh()],t.N,t.Ab)
+case 2:q=b==null?"/login":"/"
+p=A.ai(["/",new A.aDa(),"/login",new A.aDb(),"/attendance",new A.aDc(),"/report",new A.aDd(),"/user-list",new A.aDe(),"/settings",new A.aDf(),"/departments",new A.aDg(),"/add-user-new",new A.aDh()],t.N,t.Ab)
 if($.a5==null)A.aMh()
-p=$.a5
-p.toString
-o=$.b2().gdC().b
-n=t.e8
-if(n.a(o.i(0,0))==null)A.a0(A.af('The app requested a view, but the platform did not provide one.\nThis is likely because the app called `runApp` to render its root widget, which expects the platform to provide a default view to render into (the "implicit" view).\nHowever, the platform likely has multi-view mode enabled, which does not create this default "implicit" view.\nTry using `runWidget` instead of `runApp` to start your app.\n`runWidget` allows you to provide a `View` widget, without requiring a default view.\nSee: https://flutter.dev/to/web-multiview-runwidget'))
-m=n.a(o.i(0,0))
-m.toString
-l=p.gDx()
-k=p.ch$
-if(k===$){o=n.a(o.i(0,0))
+o=$.a5
 o.toString
-j=new A.ZO(B.J,o,null,A.ag())
-j.aJ()
-j.a82(null,null,o)
-p.ch$!==$&&A.aw()
-p.ch$=j
-k=j}p.a27(new A.F2(m,new A.BU(q,"/",!1,null),l,k,null))
-p.N1()
+n=$.b2().gdC().b
+m=t.e8
+if(m.a(n.i(0,0))==null)A.a0(A.af('The app requested a view, but the platform did not provide one.\nThis is likely because the app called `runApp` to render its root widget, which expects the platform to provide a default view to render into (the "implicit" view).\nHowever, the platform likely has multi-view mode enabled, which does not create this default "implicit" view.\nTry using `runWidget` instead of `runApp` to start your app.\n`runWidget` allows you to provide a `View` widget, without requiring a default view.\nSee: https://flutter.dev/to/web-multiview-runwidget'))
+l=m.a(n.i(0,0))
+l.toString
+k=o.gDx()
+j=o.ch$
+if(j===$){n=m.a(n.i(0,0))
+n.toString
+i=new A.ZO(B.J,n,null,A.ag())
+i.aJ()
+i.a82(null,null,n)
+o.ch$!==$&&A.aw()
+o.ch$=i
+j=i}o.a27(new A.F2(l,new A.BU(p,q,!1,null),k,j,null))
+o.N1()
 return A.H(null,r)}})
 return A.I($async$aD7,r)},
 aDa:function aDa(){},

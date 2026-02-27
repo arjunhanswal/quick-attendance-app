@@ -17,7 +17,7 @@ Future<void> main() async {
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    initialRoute: session == null ? '/' : '/',
+    initialRoute: session == null ? '/login' : '/',
     routes: {
       '/': (context) => const HomePage(),
       '/login': (context) => LoginPage(),

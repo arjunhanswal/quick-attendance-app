@@ -98,136 +98,136 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // 📅 Date Row
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Showing data for: $formattedDate",
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                TextButton.icon(
-                  icon: const Icon(Icons.calendar_today),
-                  label: const Text("Change"),
-                  onPressed: _pickDate,
-                ),
-              ],
-            ),
+      body: Column(children: [
+        // 📅 Date Row
+        Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Showing data for: $formattedDate",
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              TextButton.icon(
+                icon: const Icon(Icons.calendar_today),
+                label: const Text("Change"),
+                onPressed: _pickDate,
+              ),
+            ],
           ),
+        ),
 
-          // 📊 Stats in horizontal row
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              children: [
-                _buildStatCard("Total", totalSewadars, Colors.deepPurple),
-                const SizedBox(width: 8),
-                _buildStatCard("Present", presentCount, Colors.green),
-                const SizedBox(width: 8),
-                _buildStatCard("Absent", absentCount, Colors.red),
-              ],
-            ),
+        // 📊 Stats in horizontal row
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            children: [
+              _buildStatCard("Total", totalSewadars, Colors.deepPurple),
+              const SizedBox(width: 8),
+              _buildStatCard("Present", presentCount, Colors.green),
+              const SizedBox(width: 8),
+              _buildStatCard("Absent", absentCount, Colors.red),
+            ],
           ),
-          const SizedBox(height: 20),
+        ),
+        const SizedBox(height: 20),
 
-          // 📋 Attendance header (mobile column removed)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            color: Colors.grey.shade300,
-            child: Row(
-              children: const [
-                Expanded(
-                    flex: 2,
-                    child: Text("Name",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15))),
-                Expanded(
-                    flex: 1,
-                    child: Text("Badge",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15))),
-                Expanded(
-                    flex: 2,
-                    child: Text("Time",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15))),
-                Expanded(
-                    flex: 1,
-                    child: Text("Status",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15))),
-              ],
-            ),
+        // 📋 Attendance header (mobile column removed)
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          color: Colors.grey.shade300,
+          child: Row(
+            children: const [
+              Expanded(
+                  flex: 2,
+                  child: Text("Name",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 15))),
+              Expanded(
+                  flex: 1,
+                  child: Text("Badge",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 15))),
+              Expanded(
+                  flex: 1,
+                  child: Text("In Time",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 15))),
+              Expanded(
+                  flex: 1,
+                  child: Text("Out Time",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 15))),
+            ],
           ),
+        ),
 
-          // 📋 Attendance list
-          Expanded(
-            child: presentUsers.isEmpty
-                ? const Center(child: Text("⚠️ No one marked present"))
-                : ListView.separated(
-                    itemCount: presentUsers.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
-                    itemBuilder: (context, index) {
-                      final record = presentUsers[index];
-                      Map<String, dynamic> extraData = {};
-                      if (record['data'] != null && record['data'] is String) {
-                        try {
-                          extraData = jsonDecode(record['data']);
-                        } catch (_) {}
+        // 📋 Attendance list
+        // 📋 Attendance list
+        Expanded(
+          child: presentUsers.isEmpty
+              ? const Center(child: Text("⚠️ No one marked present"))
+              : ListView.builder(
+                  itemCount: presentUsers.length,
+                  itemBuilder: (context, index) {
+                    final record = presentUsers[index];
+
+                    Map<String, dynamic> userData = {};
+
+                    // Parse DATA JSON
+                    try {
+                      if (record['data'] != null) {
+                        userData = jsonDecode(record['data']);
                       }
+                    } catch (e) {
+                      debugPrint("JSON parse error $e");
+                    }
 
-                      final name = extraData['sewadar_name'] ?? 'Unknown';
-                      final badge = extraData['badge_no'] ?? '-';
+                    final name = userData['sewadar_name'] ?? "Unknown";
 
-                      // ✅ Convert UTC -> Local (IST on your device)
-                      DateTime? localTime;
-                      try {
-                        final inputFormat = DateFormat(
-                            "yyyy-MM-dd HH:mm:ss"); // match your string
-                        localTime = inputFormat
-                            .parse(record['datetime'], true)
+                    final badge = userData['badge_no'] ?? "-";
+
+                    String inFormatted = "-";
+                    String outFormatted = "-";
+
+                    try {
+                      if (record['check_in_time'] != null) {
+                        final inLocal = DateFormat("yyyy-MM-dd HH:mm:ss")
+                            .parse(record['check_in_time'], true)
                             .toLocal();
-                      } catch (e) {
-                        print("Parse error: $e");
+
+                        inFormatted = DateFormat('hh:mm a').format(inLocal);
                       }
 
-                      final formattedTime = localTime != null
-                          ? DateFormat('hh:mm a').format(localTime)
-                          : "Invalid time";
+                      if (record['check_out_time'] != null) {
+                        final outLocal = DateFormat("yyyy-MM-dd HH:mm:ss")
+                            .parse(record['check_out_time'], true)
+                            .toLocal();
 
-                      final status = record['attendance'] ?? 'Unknown';
+                        outFormatted = DateFormat('hh:mm a').format(outLocal);
+                      }
+                    } catch (e) {
+                      debugPrint("Time parse error $e");
+                    }
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 6),
-                        child: Row(
-                          children: [
-                            Expanded(
-                                flex: 2,
-                                child: Text(capitalizeName(name),
-                                    style: const TextStyle(fontSize: 15))),
-                            Expanded(
-                                flex: 1,
-                                child: Text(badge,
-                                    style: const TextStyle(fontSize: 15))),
-                            Expanded(
-                                flex: 2,
-                                child: Text(formattedTime,
-                                    style: const TextStyle(fontSize: 15))),
-                            Expanded(
-                                flex: 1,
-                                child: Text(status,
-                                    style: const TextStyle(fontSize: 15))),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 10),
+                      decoration: BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(color: Colors.grey.shade300))),
+                      child: Row(
+                        children: [
+                          Expanded(flex: 2, child: Text(capitalizeName(name))),
+                          Expanded(flex: 1, child: Text(badge)),
+                          Expanded(flex: 1, child: Text(inFormatted)),
+                          Expanded(flex: 1, child: Text(outFormatted)),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ]),
     );
   }
 

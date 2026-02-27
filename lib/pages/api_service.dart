@@ -206,6 +206,88 @@ class ApiService {
   //   }
   // }
 
+  static Future<void> checkin({
+    required String sid,
+    required DateTime check_in_time,
+    required DateTime checkIndate,
+  }) async {
+    final url = Uri.parse("$baseUrl/presence/checkin");
+
+    final body = {
+      "sid": int.tryParse(sid) ?? sid,
+      "check_in_time": DateFormat('yyyy-MM-dd HH:mm:ss').format(check_in_time),
+      "date": DateFormat('yyyy-MM-dd').format(checkIndate),
+    };
+
+    try {
+      print("Checkin Request:");
+      print(jsonEncode(body));
+
+      final response = await http
+          .post(
+            url,
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      print("Checkin Response:");
+      print(response.body);
+
+      if (response.statusCode != 200) {
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      print("Checkin Error: $e");
+
+      throw Exception("Checkin Failed");
+    }
+  }
+
+  // ---------------- CHECK OUT ----------------
+
+  static Future<void> checkout({
+    required String sid,
+    required DateTime checkOutTime,
+    required DateTime checkIndate,
+  }) async {
+    final url = Uri.parse("$baseUrl/presence/checkout");
+
+    final body = {
+      "sid": int.tryParse(sid) ?? sid,
+      "check_out_time": DateFormat('yyyy-MM-dd HH:mm:ss').format(checkOutTime),
+      "date": DateFormat('yyyy-MM-dd').format(checkIndate),
+    };
+
+    try {
+      print("Checkout Request:");
+      print(jsonEncode(body));
+
+      final response = await http
+          .post(
+            url,
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      print("Checkout Response:");
+      print(response.body);
+
+      if (response.statusCode != 200) {
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      print("Checkout Error: $e");
+
+      throw Exception("Checkout Failed");
+    }
+  }
+
   static Future<dynamic> getdashboardDetails(String endpoint,
       {Map<String, dynamic>? body}) async {
     final url = Uri.parse("$baseUrl$endpoint");

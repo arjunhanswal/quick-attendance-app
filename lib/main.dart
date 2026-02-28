@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'pages/homepage.dart';
 import 'pages/loginpage.dart';
-import 'pages/attendance_page.dart';
+import 'pages/attendance_new.dart';
 import 'pages/report_page.dart';
 import 'pages/user_list_page.dart';
 import 'pages/setting.dart';
@@ -21,7 +21,7 @@ Future<void> main() async {
     routes: {
       '/': (context) => const HomePage(),
       '/login': (context) => LoginPage(),
-      '/attendance': (context) => const AttendancePage(),
+      '/attendance': (context) => const AttendanceNew(),
       '/report': (context) => const ReportPage(),
       '/user-list': (context) => const UserListPage(),
       '/settings': (context) => const SettingsPage(),

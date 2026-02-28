@@ -182,6 +182,7 @@ class _AttendanceNewState extends State<AttendanceNew> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
               ),
               onPressed: () => handleCheckIn(user['sid']),
               child: const Text("IN"),
@@ -190,6 +191,7 @@ class _AttendanceNewState extends State<AttendanceNew> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
               ),
               onPressed: () => handleCheckOut(user['sid']),
               child: const Text("OUT"),

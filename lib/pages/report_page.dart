@@ -85,72 +85,73 @@ class _ReportPageState extends State<ReportPage> {
     }
   }
 
-  Future<void> _exportToCSV() async {
-    List<List<String>> csvData = [
-      ['Sewadar Name', 'Badge No', 'Mobile', 'Attendance Time', 'created time']
-    ];
+  // Future<void> _exportToCSV() async {
+  //   List<List<String>> csvData = [
+  //     ['Sewadar Name', 'Badge No', 'Mobile', 'checkin Time', 'checkout Time','created time']
+  //   ];
 
-    for (var record in presentUsers) {
-      Map<String, dynamic> extraData = {};
-      if (record['data'] != null && record['data'] is String) {
-        try {
-          extraData = jsonDecode(record['data']);
-        } catch (_) {}
-      }
+  //   for (var record in presentUsers) {
+  //     Map<String, dynamic> extraData = {};
+  //     if (record['data'] != null && record['data'] is String) {
+  //       try {
+  //         extraData = jsonDecode(record['data']);
+  //       } catch (_) {}
+  //     }
 
-      final name = extraData['sewadar_name'] ?? 'Unknown';
-      final badge = extraData['badge_no'] ?? '-';
-      final mobile = extraData['mobile_self'] ?? '-';
+  //     final name = extraData['sewadar_name'] ?? 'Unknown';
+  //     final badge = extraData['badge_no'] ?? '-';
+  //     final mobile = extraData['mobile_self'] ?? '-';
+  //     final checkintime = record['check_in_time'] ?? '-';
+  //     final checkoutitme  = record['check_out_time'] ?? '-';
+  //     final rawDate = record['datetime'];
+  //     DateTime? timestamp;
 
-      final rawDate = record['datetime'];
-      DateTime? timestamp;
+  //     if (rawDate != null && rawDate.isNotEmpty) {
+  //       final parsed = DateTime.parse(rawDate);
 
-      if (rawDate != null && rawDate.isNotEmpty) {
-        final parsed = DateTime.parse(rawDate);
+  //       // 🚨 Force backend value to be UTC
+  //       timestamp = DateTime.utc(
+  //         parsed.year,
+  //         parsed.month,
+  //         parsed.day,
+  //         parsed.hour,
+  //         parsed.minute,
+  //         parsed.second,
+  //       ).toLocal();
+  //     }
 
-        // 🚨 Force backend value to be UTC
-        timestamp = DateTime.utc(
-          parsed.year,
-          parsed.month,
-          parsed.day,
-          parsed.hour,
-          parsed.minute,
-          parsed.second,
-        ).toLocal();
-      }
+  //     final time = timestamp != null
+  //         ? DateFormat('yyyy-MM-dd HH:mm').format(timestamp)
+  //         : '';
+  //     ;
 
-      final time = timestamp != null
-          ? DateFormat('yyyy-MM-dd HH:mm').format(timestamp)
-          : '';
-      ;
+  //     csvData.add([name, badge, mobile, time]);
+  //   }
 
-      csvData.add([name, badge, mobile, time]);
-    }
+  //   final csv = const ListToCsvConverter().convert(csvData);
+  //   final fileName =
+  //       'attendance_report_${DateTime.now().millisecondsSinceEpoch}.csv';
 
-    final csv = const ListToCsvConverter().convert(csvData);
-    final fileName =
-        'attendance_report_${DateTime.now().millisecondsSinceEpoch}.csv';
+  //   if (kIsWeb) {
+  //     // ✅ Web: trigger browser download
+  //     final bytes = utf8.encode(csv);
+  //     final blob = html.Blob([bytes], 'text/csv');
+  //     final url = html.Url.createObjectUrlFromBlob(blob);
+  //     final anchor = html.AnchorElement(href: url)
+  //       ..setAttribute('download', fileName)
+  //       ..click();
+  //     html.Url.revokeObjectUrl(url);
+  //   } else {
+  //     // ✅ Mobile/Desktop: Save to temp & share
+  //     final directory = await getTemporaryDirectory();
+  //     final path = '${directory.path}/$fileName';
+  //     final file = File(path);
+  //     await file.writeAsString(csv);
 
-    if (kIsWeb) {
-      // ✅ Web: trigger browser download
-      final bytes = utf8.encode(csv);
-      final blob = html.Blob([bytes], 'text/csv');
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      final anchor = html.AnchorElement(href: url)
-        ..setAttribute('download', fileName)
-        ..click();
-      html.Url.revokeObjectUrl(url);
-    } else {
-      // ✅ Mobile/Desktop: Save to temp & share
-      final directory = await getTemporaryDirectory();
-      final path = '${directory.path}/$fileName';
-      final file = File(path);
-      await file.writeAsString(csv);
-
-      await Share.shareXFiles([XFile(file.path)],
-          text: 'Here is the exported attendance report CSV');
-    }
-  }
+  //     await Share.shareXFiles([XFile(file.path)],
+  //         text: 'Here is the exported attendance report CSV');
+  //   }
+  // }
 
   // Future<void> _exportToCSV() async {
   //   List<List<String>> csvData = [
@@ -187,6 +188,100 @@ class _ReportPageState extends State<ReportPage> {
   //   await Share.shareXFiles([XFile(file.path)],
   //       text: 'Here is the exported attendance report CSV');
   // }
+  Future<void> _exportToCSV() async {
+    List<List<String>> csvData = [
+      [
+        'Sewadar Name',
+        'Badge No',
+        'Mobile',
+        'Checkin Time',
+        'Checkout Time',
+        'Created Time'
+      ]
+    ];
+
+    for (var record in presentUsers) {
+      Map<String, dynamic> extraData = {};
+
+      if (record['data'] != null && record['data'] is String) {
+        try {
+          extraData = jsonDecode(record['data']);
+        } catch (_) {}
+      }
+
+      final name = extraData['sewadar_name'] ?? 'Unknown';
+      final badge = extraData['badge_no'] ?? '-';
+      final mobile = extraData['mobile_self'] ?? '-';
+
+      /// ✅ Checkin Checkout
+      final checkinTime = record['check_in_time'] ?? '-';
+      final checkoutTime = record['check_out_time'] ?? '-';
+
+      /// ✅ Created Time Convert UTC → Local
+      final rawDate = record['datetime'];
+
+      DateTime? timestamp;
+
+      if (rawDate != null && rawDate.toString().isNotEmpty) {
+        final parsed = DateTime.parse(rawDate);
+
+        timestamp = DateTime.utc(
+          parsed.year,
+          parsed.month,
+          parsed.day,
+          parsed.hour,
+          parsed.minute,
+          parsed.second,
+        ).toLocal();
+      }
+
+      final createdTime = timestamp != null
+          ? DateFormat('yyyy-MM-dd HH:mm').format(timestamp)
+          : "";
+
+      /// ✅ Add Row
+      csvData.add([
+        name.toString(),
+        badge.toString(),
+        mobile.toString(),
+        checkinTime.toString(),
+        checkoutTime.toString(),
+        createdTime
+      ]);
+    }
+
+    final csv = const ListToCsvConverter().convert(csvData);
+
+    final fileName =
+        'attendance_report_${DateTime.now().millisecondsSinceEpoch}.csv';
+
+    if (kIsWeb) {
+      final bytes = utf8.encode(csv);
+
+      final blob = html.Blob([bytes], 'text/csv');
+
+      final url = html.Url.createObjectUrlFromBlob(blob);
+
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute('download', fileName)
+        ..click();
+
+      html.Url.revokeObjectUrl(url);
+    } else {
+      final directory = await getTemporaryDirectory();
+
+      final path = '${directory.path}/$fileName';
+
+      final file = File(path);
+
+      await file.writeAsString(csv);
+
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: 'Here is the exported attendance report CSV',
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

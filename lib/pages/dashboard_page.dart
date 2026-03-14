@@ -192,7 +192,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     try {
                       if (record['check_in_time'] != null) {
                         final inLocal = DateFormat("yyyy-MM-dd HH:mm:ss")
-                            .parse(record['check_in_time'], true)
+                            .parse(record['check_in_time'])
                             .toLocal();
 
                         inFormatted = DateFormat('hh:mm a').format(inLocal);
@@ -200,7 +200,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
                       if (record['check_out_time'] != null) {
                         final outLocal = DateFormat("yyyy-MM-dd HH:mm:ss")
-                            .parse(record['check_out_time'], true)
+                            .parse(record['check_out_time'])
                             .toLocal();
 
                         outFormatted = DateFormat('hh:mm a').format(outLocal);

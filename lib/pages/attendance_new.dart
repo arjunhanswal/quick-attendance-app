@@ -69,7 +69,10 @@ class _AttendanceNewState extends State<AttendanceNew> {
 
       setState(() {
         _filtered = _sewadars.where((user) {
-          return user['name'].toString().toLowerCase().contains(query);
+          final name = user['name'].toString().toLowerCase();
+          final badge = user['badge'].toString().toLowerCase();
+
+          return name.contains(query) || badge.contains(query);
         }).toList();
       });
     });

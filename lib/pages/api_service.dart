@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
 class ApiService {
-  static const String baseUrl = "https://attapiprod.codezhub.tech/api";
+  static const String baseUrl = "https://attapiprod.findurcode.online/api";
 
   /// 📋 Get all active sewadar
   static Future<List<Map<String, dynamic>>> getSewadars() async {
